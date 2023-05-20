@@ -1,14 +1,16 @@
-package com.example.ch.service;
+package com.wu.ming.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.wu.ming.service.YAMLService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Map;
@@ -19,7 +21,7 @@ import java.util.Map;
  * @date 2023/5/12 14:06
  */
 @Service
-public class YAMLServiceImpl implements YAMLService{
+public class YAMLServiceImpl implements YAMLService {
     @Override
     public String toJSON(String yamlString) throws JsonProcessingException {
         try {
@@ -84,7 +86,23 @@ public class YAMLServiceImpl implements YAMLService{
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
-        return new ResponseEntity<>(csvBuilder.toString(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(csvBuilder.toString(), HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) {
+        return null;
+    }
+
 
 }
