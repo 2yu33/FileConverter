@@ -50,4 +50,10 @@ public class YAMLController {
     public ResponseEntity<byte[]> yamlToCsv(@RequestPart("file") MultipartFile file) {
         return yamlService.fileYamlToCsv(file);
     }
+
+
+    @PostMapping("/yamlValidate")
+    public boolean validateYaml(String yamlStr){
+        return yamlService.yamlValidate(yamlStr);
+    }
 }
