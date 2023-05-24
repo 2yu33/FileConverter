@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.wu.ming.service.JsonService;
 import net.sf.json.JSON;
@@ -11,12 +14,23 @@ import net.sf.json.JSONSerializer;
 import net.sf.json.xml.XMLSerializer;
 import org.json.CDL;
 import org.json.JSONArray;
+import org.json.XML;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
 
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
 @Service
+
 public class JsonServiceImpl implements JsonService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Override
@@ -81,4 +95,98 @@ public class JsonServiceImpl implements JsonService {
         }
         return csv;
     }
+    @Override
+    public ResponseEntity<byte[]> fileJson2Xml(MultipartFile file) throws IOException {
+        // 读取上传的JSON文件
+        String jsonContent = new String(file.getBytes());
+
+
+        String xmlContent = json2Xml(jsonContent);
+
+        // 将XML字符串转换为字节数组
+        byte[] xmlBytes = xmlContent.getBytes();
+
+
+
+        // 设置响应头信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.xml");
+        // 指定下载文件的名称和类型
+        String fileName = "file.xml";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(xmlBytes);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+
+    }
+
+    @Override
+    public ResponseEntity<byte[]> fileJson2Yaml(MultipartFile file) throws IOException {
+        // 读取上传的JSON文件
+        String jsonContent = new String(file.getBytes());
+
+        //        将读取的json字符串转为yaml
+        String yamlContent = json2Yaml(jsonContent);
+
+        // 将yaml字符串转换为字节数组
+        byte[] yamlBytes = yamlContent.getBytes();
+
+        // 设置响应头信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.xml");
+        // 指定下载文件的名称和类型
+        String fileName = "file.yaml";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(yamlBytes);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+
+    }
+
+    @Override
+    public ResponseEntity<byte[]> fileJson2Csv(MultipartFile file) throws IOException {
+        // 读取上传的JSON文件
+        String jsonContent = new String(file.getBytes());
+
+        //        将读取的json字符串转为yaml
+        String csvContent = json2Csv(jsonContent);
+
+        // 将yaml字符串转换为字节数组
+        byte[] csvBytes = csvContent.getBytes();
+        // 设置响应头信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.xml");
+        // 指定下载文件的名称和类型
+        String fileName = "file.csv";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(csvBytes);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+
+    }
+
 }

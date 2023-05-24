@@ -1,27 +1,48 @@
 package com.wu.ming.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface JsonService {
     /**
      * json转xml
      * @param json
-     * @return
+     * @return 返回xml字符串
      */
-    public String json2Xml(String json);
+     String json2Xml(String json);
 
     /**
      * json转yaml
      * @param json
-     * @return
+     * @return  返回yaml字符串
      */
-    public String json2Yaml(String json) throws JsonProcessingException;
+     String json2Yaml(String json) throws JsonProcessingException;
 
     /**
      * json转xml
      * @param json
-     * @return
+     * @return   返回csv字符串
      */
-    public String json2Csv(String json) throws JsonProcessingException;
-
+     String json2Csv(String json) throws JsonProcessingException;
+    /**
+     * json转xml
+     * @param file 上传的文件
+     * @return  返回xml格式的文件
+     */
+    ResponseEntity<byte[]> fileJson2Xml(MultipartFile file) throws IOException;
+    /**
+     * json转yaml
+     * @param file 上传的文件
+     * @return 返回yaml的文件
+     */
+    ResponseEntity<byte[]> fileJson2Yaml(MultipartFile file) throws IOException;
+    /**
+     * json转csv
+     * @param file 上传的文件
+     * @return 返回csv类型的文件
+     */
+    ResponseEntity<byte[]> fileJson2Csv(MultipartFile file) throws IOException;
 }

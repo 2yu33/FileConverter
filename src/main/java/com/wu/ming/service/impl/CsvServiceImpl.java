@@ -9,15 +9,14 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.service.CsvService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.Map;
 
 @Service
 public class CsvServiceImpl implements CsvService {
+
 
     @Override
     public String csvToJson(String csvString) throws IOException, CsvValidationException {
@@ -83,7 +83,7 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public String fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity<byte[]> fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -98,11 +98,27 @@ public class CsvServiceImpl implements CsvService {
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        return mapper.writeValueAsString(personList);
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = mapper.writeValueAsString(personList).getBytes();
+
+        // 指定下载文件的名称和类型
+        String fileName = "file.json";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
 
     @Override
-    public String fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity<byte[]> fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -116,11 +132,27 @@ public class CsvServiceImpl implements CsvService {
         }
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-        return xmlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataList);
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = xmlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataList).getBytes();
+
+        // 指定下载文件的名称和类型
+        String fileName = "file.xml";
+        String contentType = MediaType.APPLICATION_XML_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
 
     @Override
-    public String fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity<byte[]> fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -138,7 +170,23 @@ public class CsvServiceImpl implements CsvService {
         Yaml yaml = new Yaml(options);
         StringWriter writer = new StringWriter();
         yaml.dump(personList, writer);
-        return writer.toString();
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = writer.toString().getBytes();
+
+        // 指定下载文件的名称和类型
+        String fileName = "file.yaml";
+        String contentType = MediaType.TEXT_PLAIN_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
 
 }
