@@ -39,12 +39,12 @@ public class JsonController {
             CsvValidationException{
         return jsonService.fileJson2Xml(file);
     }
-    @PostMapping("/fileJson2yaml")
+    @PostMapping("/file/Json2yaml")
     public ResponseEntity<byte[]> fileJson2Yaml(@RequestPart("file") MultipartFile file) throws IOException,
             CsvValidationException{
         return jsonService.fileJson2Yaml(file);
     }
-    @PostMapping("/fileJson2csv")
+    @PostMapping("/file/Json2csv")
     public ResponseEntity<byte[]> fileJson2Csv(@RequestPart("file") MultipartFile file) throws IOException,
             CsvValidationException{
         return jsonService.fileJson2Csv(file);
