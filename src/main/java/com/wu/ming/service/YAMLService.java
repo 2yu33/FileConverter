@@ -9,10 +9,40 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface YAMLService {
+    /**
+     * yaml转换json
+     * @param  yamlString
+     * @return    转换后的字符串
+     */
     String toJSON(String yamlString) throws JsonProcessingException;
+    /**
+     * yaml转换xml
+     * @param  yamlString
+     * @return    转换后的字符串
+     */
     String toXML(String yamlString) throws JsonProcessingException;
+    /**
+     * yaml转换csv
+     * @param  yamlString
+     * @return    转换后的字符串
+     */
     String toCSV(String yamlString) throws JsonProcessingException;
+    /**
+     * yaml文件转换json文件
+     * @param  file
+     * @return    转换后的文件
+     */
     ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) throws IOException;
+    /**
+     * yaml文件转换xml文件
+     * @param  file
+     * @return    转换后的文件
+     */
     ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException;
-    ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) throws FileNotFoundException, IOException;
+    /**
+     * yaml文件转换csv文件
+     * @param  file
+     * @return    转换后的文件
+     */
+    ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) throws  IOException;
 }
