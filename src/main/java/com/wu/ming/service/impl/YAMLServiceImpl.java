@@ -104,20 +104,4 @@ public class YAMLServiceImpl implements YAMLService {
         return null;
     }
 
-<<<<<<< HEAD
-    @Override
-    public boolean yamlValidate(String yamlString) {
-        try {
-            ObjectMapper mapper = new ObjectMapper(new com.fasterxml.jackson.dataformat.yaml.YAMLFactory());
-            mapper.readTree(yamlString);
-            return true; // YAML字符串有效
-        } catch (Exception e) {
-            // 其他异常，如IO异常或解析异常,说明字符串失效
-            return false;
-        }
-    }
 }
-=======
-
-}
->>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9

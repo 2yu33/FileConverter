@@ -14,16 +14,5 @@ public interface YAMLService {
     ResponseEntity<byte[]> fileYamlToJson(MultipartFile file);
     ResponseEntity<byte[]> fileYamlToXml(MultipartFile file);
     ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file);
-<<<<<<< HEAD
 
-
-    /**
-     * 校验yaml字符串
-     * @param yaml
-     * @return 校验结果
-     */
-    public boolean yamlValidate(String yamlString);
 }
-=======
-}
->>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9

@@ -1,18 +1,10 @@
 package com.wu.ming.controller;
 
-<<<<<<< HEAD
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wu.ming.service.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-=======
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.wu.ming.service.JsonService;
-import com.wu.ming.service.XmlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
->>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -48,7 +40,6 @@ public class XmlController {
     }
 
     @PostMapping("/xml2json")
-<<<<<<< HEAD
     public String xml2json(String xmlStr){
         return xmlService.xml2json(xmlStr);
     }
@@ -104,11 +95,5 @@ public class XmlController {
     //     // 处理文件为空的情况
     //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     // }
-
-=======
-    public String xml2json(String jsonStr) {
-        return "";
-    }
->>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
 
 }

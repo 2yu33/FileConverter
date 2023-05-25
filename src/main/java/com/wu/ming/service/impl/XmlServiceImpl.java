@@ -10,19 +10,13 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.wu.ming.service.XmlService;
-
-import java.io.*;
-import java.util.*;
-
 import com.opencsv.CSVWriter;
-import org.apache.commons.io.IOUtils;
+import com.wu.ming.service.XmlService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +31,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class XmlServiceImpl implements XmlService {
@@ -239,18 +235,6 @@ public class XmlServiceImpl implements XmlService {
     }
 
 
-    public static String fileXml2Json(File xmlFile) throws DocumentException, IOException {
-        // 使用dom4j库解析XML文件
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(xmlFile);
-
-        // 使用Jackson库将XML转换为JSON字符串
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(document);
-
-        return json;
-    }
-
     public static void main(String[] args) throws IOException {
         // Read XML input from user
         String xmlInput = "<root><person><name>John</name><age>30</age><email>john@example.com</email></person><person><name>Jane</name><age>25</age><email>jane@example.com</email></person></root>";
@@ -349,7 +333,6 @@ public class XmlServiceImpl implements XmlService {
 
         return csvData;
     }
-
 
 
     private String[] getXmlElementNames(org.w3c.dom.Element element) {
