@@ -139,7 +139,6 @@ public class YAMLServiceImpl implements YAMLService {
         //读取文件
         BufferedReader reader = null;
         StringBuffer buffer = new StringBuffer();
-        buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         try {
             reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
             String line = reader.readLine();
