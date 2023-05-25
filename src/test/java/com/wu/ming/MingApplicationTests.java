@@ -1,6 +1,10 @@
 package com.wu.ming;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+<<<<<<< HEAD
+import com.wu.ming.service.XmlService;
+import com.wu.ming.service.YAMLService;
+=======
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -9,7 +13,9 @@ import com.wu.ming.service.JsonService;
 import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONException;
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -18,8 +24,18 @@ import java.util.List;
 
 @SpringBootTest
 class MingApplicationTests {
+<<<<<<< HEAD
+
+    @Autowired
+    private XmlService xmlService;
+
+    @Autowired
+    private YAMLService yamlService;
+
+=======
     @Resource
     private JsonService jsonService;
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
     @Test
     void contextLoads() throws JsonProcessingException, JSONException {
 String jsonStr ="{\n" +
@@ -68,4 +84,55 @@ String jsonStr ="{\n" +
         System.out.println(jsonService.json2Yaml(jsonStr));
     }
 
+    @Test
+    void xml2json(){
+        String xmlString = "<root>" +
+                "<person>" +
+                "<name>John</name>" +
+                "<age>30</age>" +
+                "</person>" +
+                "<person>" +
+                "<name>Jane</name>" +
+                "<age>25</age>" +
+                "</person>" +
+                "</root>";
+        System.out.println(xmlService.xml2json(xmlString));
+    }
+
+    @Test
+    void xml2csv() throws Exception {
+        String xmlStr =  "<root>" +
+                "<person>" +
+                "<name>John Smith</name>" +
+                "<age>30</age>" +
+                "<address>江西南昌</address>" +
+                "</person>" +
+                "</root>";
+
+        System.out.println(xmlService.xml2csv(xmlStr));
+    }
+
+    @Test
+    void yamlValidate(){
+        String yamlStr = "address:\n" +
+                "  street: 123 Main Street\n" +
+                "  city: Anytown\n" +
+                "  state: AnyState\n" +
+                "  country: AnyCountry";
+
+        System.out.println(yamlService.yamlValidate(yamlStr));
+    }
+
+    @Test
+    void xmlValidate(){
+        String yamlStr = "<root>" +
+                "<person>" +
+                "<name>John Smith</name>" +
+                "<age>30</age>" +
+                "<address>江西南昌</address>" +
+                "</person>" +
+                "</root>";
+
+        System.out.println(xmlService.xmlValidate(yamlStr));
+    }
 }

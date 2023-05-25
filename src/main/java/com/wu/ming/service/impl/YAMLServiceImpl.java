@@ -30,10 +30,10 @@ import java.util.Map;
 @Service
 public class YAMLServiceImpl implements YAMLService {
     /**
-     * @author: 小C
      * @param yamlString
      * @return 转换后的字符串
      * yaml转换json
+     * @author: 小C
      */
     @Override
     public String toJSON(String yamlString) throws JsonProcessingException {
@@ -48,11 +48,12 @@ public class YAMLServiceImpl implements YAMLService {
         Object yamlObject = yamlMapper.readValue(yamlString, Object.class);
         return JSON.toJSONString(yamlObject);
     }
+
     /**
-     * @author: 小C
      * @param yamlString
      * @return 转换后的字符串
      * yaml转换xml
+     * @author: 小C
      */
     @Override
     public String toXML(String yamlString) throws JsonProcessingException {
@@ -69,19 +70,20 @@ public class YAMLServiceImpl implements YAMLService {
         String xml = objectMapper.writeValueAsString(yamlObject);
         return xml;
     }
+
     /**
-     * @author: 小C
      * @param yamlString
      * @return 转换后的字符串
      * yaml转换csv
+     * @author: 小C
      */
     @Override
-    public String toCSV(String yamlString){
+    public String toCSV(String yamlString) {
         try {
             Yaml yaml = new Yaml();
             yaml.load(yamlString);
         } catch (Exception e) {
-            return  JSON.toJSONString("输入yaml格式错误");
+            return JSON.toJSONString("输入yaml格式错误");
         }
         // 创建YAMLMapper和ObjectMapper实例
         YAMLMapper yamlMapper = new YAMLMapper();
@@ -111,11 +113,12 @@ public class YAMLServiceImpl implements YAMLService {
         headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
         return csvBuilder.toString();
     }
+
     /**
-     * @author: 小C
      * @param file
      * @return 转换后的文件
      * yaml转换json
+     * @author: 小C
      */
     @Override
     public ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) throws IOException {
@@ -130,20 +133,20 @@ public class YAMLServiceImpl implements YAMLService {
                 buffer.append("\n");
                 line = reader.readLine();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            if(reader != null){
+        } finally {
+            if (reader != null) {
                 try {
                     reader.close();
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
         }
         // 将请求中的数据转换为字节数组
-        byte[] fileData=this.toJSON(buffer.toString()).getBytes();
+        byte[] fileData = this.toJSON(buffer.toString()).getBytes();
         // 指定下载文件的名称和类型
         String fileName = "file.json";
         String contentType = MediaType.APPLICATION_JSON_VALUE;
@@ -159,11 +162,12 @@ public class YAMLServiceImpl implements YAMLService {
                 .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
+
     /**
-     * @author: 小C
      * @param file
      * @return 转换后的文件
      * yaml转换xml
+     * @author: 小C
      */
     @Override
     public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException {
@@ -178,20 +182,20 @@ public class YAMLServiceImpl implements YAMLService {
                 buffer.append("\n");
                 line = reader.readLine();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            if(reader != null){
+        } finally {
+            if (reader != null) {
                 try {
                     reader.close();
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
         }
         // 将请求中的数据转换为字节数组
-        byte[] fileData=this.toXML(buffer.toString()).getBytes();
+        byte[] fileData = this.toXML(buffer.toString()).getBytes();
         // 指定下载文件的名称和类型
         String fileName = "file.xml";
         String contentType = MediaType.APPLICATION_XML_VALUE;
@@ -207,11 +211,12 @@ public class YAMLServiceImpl implements YAMLService {
                 .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
+
     /**
-     * @author: 小C
      * @param file
      * @return 转换后的文件
      * yaml转换csv
+     * @author: 小C
      */
     @Override
     public ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) throws IOException {
