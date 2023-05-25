@@ -1,10 +1,18 @@
 package com.wu.ming.controller;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wu.ming.service.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+=======
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wu.ming.service.JsonService;
+import com.wu.ming.service.XmlService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -12,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
+import javax.annotation.Resource;
 
 @RestController
 public class XmlController {
@@ -23,11 +33,12 @@ public class XmlController {
 
     /**
      * xml转yaml
+     *
      * @param xmlStr 要转换的xml
-     * @return       转换后的结果
+     * @return 转换后的结果
      */
     @PostMapping("/xml2yaml")
-    public String xml2yaml(String xmlStr){
+    public String xml2yaml(String xmlStr) {
         return xmlService.xml2yaml(xmlStr);
     }
 
@@ -37,6 +48,7 @@ public class XmlController {
     }
 
     @PostMapping("/xml2json")
+<<<<<<< HEAD
     public String xml2json(String xmlStr){
         return xmlService.xml2json(xmlStr);
     }
@@ -93,5 +105,10 @@ public class XmlController {
     //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     // }
 
+=======
+    public String xml2json(String jsonStr) {
+        return "";
+    }
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9
 
 }

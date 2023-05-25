@@ -23,7 +23,7 @@ public class YAMLController {
     private YAMLService yamlService;
     @GetMapping("/yaml2json")
     public String ToJson(String yamlString) throws JsonProcessingException {
-       return yamlService.toJSON(yamlString);
+        return yamlService.toJSON(yamlString);
     }
 
     @GetMapping("/yaml2xml")
@@ -50,6 +50,7 @@ public class YAMLController {
     public ResponseEntity<byte[]> yamlToCsv(@RequestPart("file") MultipartFile file) {
         return yamlService.fileYamlToCsv(file);
     }
+<<<<<<< HEAD
 
 
     @PostMapping("/yamlValidate")
@@ -57,3 +58,6 @@ public class YAMLController {
         return yamlService.yamlValidate(yamlStr);
     }
 }
+=======
+}
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9

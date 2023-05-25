@@ -104,6 +104,7 @@ public class YAMLServiceImpl implements YAMLService {
         return null;
     }
 
+<<<<<<< HEAD
     @Override
     public boolean yamlValidate(String yamlString) {
         try {
@@ -116,3 +117,7 @@ public class YAMLServiceImpl implements YAMLService {
         }
     }
 }
+=======
+
+}
+>>>>>>> a547ad1a729da147ebdfb3fdfc7350118b4743f9

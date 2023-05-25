@@ -9,7 +9,6 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.service.CsvService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
