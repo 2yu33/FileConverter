@@ -23,7 +23,7 @@ public class YAMLController {
     private YAMLService yamlService;
     @GetMapping("/yaml2json")
     public String ToJson(String yamlString) throws JsonProcessingException {
-       return yamlService.toJSON(yamlString);
+        return yamlService.toJSON(yamlString);
     }
 
     @GetMapping("/yaml2xml")
@@ -32,22 +32,22 @@ public class YAMLController {
     }
 
     @GetMapping("/yaml2csv")
-    public String convertYamlToCsv(String yamlString) throws IOException {
+    public ResponseEntity<String> convertYamlToCsv(String yamlString) throws IOException {
         return yamlService.toCSV(yamlString);
     }
 
     @PostMapping(value = "/file/yaml2json")
-    public ResponseEntity<byte[]> yamlToJson(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> yamlToJson(@RequestPart("file") MultipartFile file)  {
         return yamlService.fileYamlToJson(file);
     }
 
     @PostMapping(value = "/file/yaml2xml")
-    public ResponseEntity<byte[]> yamlToXml(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> yamlToXml(@RequestPart("file") MultipartFile file) {
         return yamlService.fileYamlToXml(file);
     }
 
     @PostMapping(value = "/file/yaml2csv")
-    public ResponseEntity<byte[]> yamlToCsv(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> yamlToCsv(@RequestPart("file") MultipartFile file) {
         return yamlService.fileYamlToCsv(file);
     }
 }

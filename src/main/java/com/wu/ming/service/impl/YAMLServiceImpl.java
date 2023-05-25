@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.wu.ming.service.YAMLService;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +29,12 @@ import java.util.Map;
  */
 @Service
 public class YAMLServiceImpl implements YAMLService {
+    /**
+     * @author: 小C
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换json
+     */
     @Override
     public String toJSON(String yamlString) throws JsonProcessingException {
         try {
@@ -39,7 +48,12 @@ public class YAMLServiceImpl implements YAMLService {
         Object yamlObject = yamlMapper.readValue(yamlString, Object.class);
         return JSON.toJSONString(yamlObject);
     }
-
+    /**
+     * @author: 小C
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换xml
+     */
     @Override
     public String toXML(String yamlString) throws JsonProcessingException {
         try {
@@ -55,7 +69,12 @@ public class YAMLServiceImpl implements YAMLService {
         String xml = objectMapper.writeValueAsString(yamlObject);
         return xml;
     }
-
+    /**
+     * @author: 小C
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换csv
+     */
     @Override
     public String toCSV(String yamlString){
         try {
@@ -88,9 +107,16 @@ public class YAMLServiceImpl implements YAMLService {
             csvBuilder.append("\n");
         }
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
         return csvBuilder.toString();
     }
-
+    /**
+     * @author: 小C
+     * @param file
+     * @return 转换后的文件
+     * yaml转换json
+     */
     @Override
     public ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) throws IOException {
         //读取文件
@@ -117,7 +143,7 @@ public class YAMLServiceImpl implements YAMLService {
 
         }
         // 将请求中的数据转换为字节数组
-       byte[] fileData=this.toJSON(buffer.toString()).getBytes();
+        byte[] fileData=this.toJSON(buffer.toString()).getBytes();
         // 指定下载文件的名称和类型
         String fileName = "file.json";
         String contentType = MediaType.APPLICATION_JSON_VALUE;
@@ -133,7 +159,12 @@ public class YAMLServiceImpl implements YAMLService {
                 .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
-
+    /**
+     * @author: 小C
+     * @param file
+     * @return 转换后的文件
+     * yaml转换xml
+     */
     @Override
     public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException {
         //读取文件
@@ -176,49 +207,49 @@ public class YAMLServiceImpl implements YAMLService {
                 .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
-
+    /**
+     * @author: 小C
+     * @param file
+     * @return 转换后的文件
+     * yaml转换csv
+     */
     @Override
     public ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) throws IOException {
-        //读取文件
-        BufferedReader reader = null;
-        StringBuffer buffer = new StringBuffer();
-        try {
-            reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-            String line = reader.readLine();
-            while (StringUtils.hasLength(line)) {
-                buffer.append(line);
-                buffer.append("\n");
-                line = reader.readLine();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(reader != null){
-                try {
-                    reader.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
 
+        // 读取 YAML 文件的内容
+        byte[] yamlBytes = file.getBytes();
+        String yamlString = new String(yamlBytes);
+        Yaml yaml = new Yaml();
+        Map<String, Object> obj = yaml.load(yamlString);
+
+        // 创建 CSV printer
+        StringWriter csvWriter = new StringWriter();
+        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.RFC4180);
+
+
+        // 将每个数据行写入 CSV 文件
+        for (Map.Entry<String, Object> entry : obj.entrySet()) {
+            List<String> rowData = Arrays.asList(
+                    entry.getKey(),
+                    entry.getValue().toString(),
+                    ""
+            );
+
+            csvPrinter.printRecord(rowData);
         }
-        // 将请求中的数据转换为字节数组
-        byte[] fileData=this.toCSV(buffer.toString()).getBytes();
-        // 指定下载文件的名称和类型
-        String fileName = "file.csv";
-        String contentType = MediaType.TEXT_PLAIN_VALUE;
 
+        // 清理并返回 CSV 文件
+        csvPrinter.flush();
+        byte[] csvBytes = csvWriter.toString().getBytes(Charset.forName("UTF-8"));
+        String fileName = "file.csv";
         // 创建临时文件
         File tempFile = File.createTempFile("temp", null);
         try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-            outputStream.write(fileData);
+            outputStream.write(csvBytes);
         }
-        // 设置下载响应头
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
+                .contentType(MediaType.parseMediaType("text/csv"))
                 .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-                .body(FileUtils.readFileToByteArray(tempFile));
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
-
-
 }
