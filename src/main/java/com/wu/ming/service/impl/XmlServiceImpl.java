@@ -351,14 +351,29 @@ public class XmlServiceImpl implements XmlService {
     }
 
 
+
     private String[] getXmlElementNames(org.w3c.dom.Element element) {
-        Set<String> elementNames = new LinkedHashSet<>();
-
-        // 递归遍历XML树，获取所有元素名称
-        traverseXmlElement(element, elementNames);
-
-        return elementNames.toArray(new String[0]);
+        NodeList itemList = element.getElementsByTagName("item");
+        org.w3c.dom.Element firstItem = (org.w3c.dom.Element) itemList.item(0);
+        return getXmlItemChildElementNames(firstItem);
     }
+
+    private String[] getXmlItemChildElementNames(org.w3c.dom.Element itemElement) {
+        List<String> childElementNames = new ArrayList<>();
+
+        // 遍历子元素
+        NodeList childNodes = itemElement.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                String elementName = childNode.getNodeName();
+                childElementNames.add(elementName);
+            }
+        }
+
+        return childElementNames.toArray(new String[0]);
+    }
+
 
     private void traverseXmlElement(org.w3c.dom.Element element, Set<String> elementNames) {
         // 获取当前元素的名称
@@ -374,21 +389,16 @@ public class XmlServiceImpl implements XmlService {
             }
         }
     }
+
     private void processXmlNode(org.w3c.dom.Element element, List<String[]> csvData, String[] csvHeader) {
         // 填充CSV行数据
         String[] csvRow = new String[csvHeader.length];
-        boolean isRowEmpty = true; // 标记当前行是否为空行
         for (int i = 0; i < csvHeader.length; i++) {
             Node node = element.getElementsByTagName(csvHeader[i]).item(0);
             String value = (node != null) ? node.getTextContent() : "";
             csvRow[i] = value;
-            if (!value.isEmpty()) {
-                isRowEmpty = false;
-            }
         }
-
-        // 仅当行非空时添加到CSV数据
-        if (!isRowEmpty) {
+        if (!Arrays.equals(csvRow, csvHeader)) { // 不添加与标题行相同的行
             csvData.add(csvRow);
         }
 
@@ -396,13 +406,11 @@ public class XmlServiceImpl implements XmlService {
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+            if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("item")) {
                 processXmlNode((org.w3c.dom.Element) childNode, csvData, csvHeader);
             }
         }
     }
-
-
 
     private byte[] readFileContent(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);
