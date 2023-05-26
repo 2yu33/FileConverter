@@ -49,22 +49,5 @@ public class CsvController {
     public ResponseEntity fileCsvToYaml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
         return csvService.fileCsvToYaml(file);
     }
-    @PostMapping("/validate/csv")
-    public BaseResponse validateCsv(@RequestBody String csvString) {
-        boolean isValid = csvValidator.validateCsv(csvString);
-        if (isValid) {
-            return ResultUtils.error(ErrorCode.SUCCESS,"格式正确","CSV格式正确!");
-        } else {
-            return ResultUtils.error(201,"格式错误","csv格式错误！");
-        }
-    }
-    @PostMapping("/file/validate/csv")
-    public BaseResponse validateCsvFile(@RequestPart MultipartFile file){
-        boolean isValid = csvValidator.fileValidateCsv(file);
-        if (isValid) {
-            return ResultUtils.error(ErrorCode.SUCCESS,"格式正确","CSV格式正确!");
-        } else {
-            return ResultUtils.error(201,"格式错误","csv格式错误！");
-        }
-    }
+
 }
