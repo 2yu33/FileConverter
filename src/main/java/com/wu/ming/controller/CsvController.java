@@ -3,9 +3,12 @@ package com.wu.ming.controller;
 
 
 import com.opencsv.exceptions.CsvValidationException;
+import com.wu.ming.common.BaseResponse;
+import com.wu.ming.common.ErrorCode;
+import com.wu.ming.common.ResultUtils;
 import com.wu.ming.service.CsvService;
+import com.wu.ming.utils.CsvValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 @RestController
@@ -22,16 +23,18 @@ public class CsvController {
 
     @Autowired
     private CsvService csvService;
+    @Autowired
+    private CsvValidator csvValidator;
     @PostMapping("/csv2json")
-    public String csvToJson(@RequestBody String csvString) throws IOException, CsvValidationException {
+    public BaseResponse<String> csvToJson(@RequestBody String csvString) throws IOException, CsvValidationException {
         return csvService.csvToJson(csvString);
     }
     @PostMapping("/csv2xml")
-    public String csvToXml(@RequestBody String csvString) throws IOException, CsvValidationException {
+    public BaseResponse<String> csvToXml(@RequestBody String csvString) throws IOException, CsvValidationException {
         return csvService.csvToXml(csvString);
     }
     @PostMapping("/csv2yaml")
-    public String csvToYaml(@RequestBody String csvString) throws IOException, CsvValidationException {
+    public BaseResponse<String> csvToYaml(@RequestBody String csvString) throws IOException, CsvValidationException {
         return csvService.csvToYaml(csvString);
     }
     @PostMapping(value = "/file/csv2json")
@@ -46,25 +49,22 @@ public class CsvController {
     public ResponseEntity<byte[]> fileCsvToYaml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
         return csvService.fileCsvToYaml(file);
     }
-    @PostMapping(value = "/download")
-    public ResponseEntity<byte[]> downloadFile(@RequestBody String  requestData) throws IOException, CsvValidationException {
-        // 将请求中的数据转换为字节数组
-        byte[] fileData = requestData.getBytes();
-
-        // 指定下载文件的名称和类型
-        String fileName = "file.json";
-        String contentType = MediaType.TEXT_PLAIN_VALUE;
-
-        // 创建临时文件
-        File tempFile = File.createTempFile("temp", null);
-        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-            outputStream.write(fileData);
+    @PostMapping("/validate/csv")
+    public BaseResponse validateCsv(@RequestBody String csvString) {
+        boolean isValid = csvValidator.validateCsv(csvString);
+        if (isValid) {
+            return ResultUtils.error(ErrorCode.SUCCESS,"格式正确","CSV格式正确!");
+        } else {
+            return ResultUtils.error(201,"格式错误","csv格式错误！");
         }
-
-        // 设置下载响应头
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+    }
+    @PostMapping("/file/validate/csv")
+    public BaseResponse validateCsvFile(@RequestPart MultipartFile file){
+        boolean isValid = csvValidator.fileValidateCsv(file);
+        if (isValid) {
+            return ResultUtils.error(ErrorCode.SUCCESS,"格式正确","CSV格式正确!");
+        } else {
+            return ResultUtils.error(201,"格式错误","csv格式错误！");
+        }
     }
 }

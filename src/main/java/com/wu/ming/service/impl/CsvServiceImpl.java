@@ -8,6 +8,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import com.wu.ming.common.BaseResponse;
+import com.wu.ming.common.ResultUtils;
 import com.wu.ming.service.CsvService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class CsvServiceImpl implements CsvService {
 
 
     @Override
-    public String csvToJson(String csvString) throws IOException, CsvValidationException {
+    public BaseResponse<String> csvToJson(String csvString) throws IOException, CsvValidationException {
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -39,11 +41,12 @@ public class CsvServiceImpl implements CsvService {
             }
             jsonList.add(json);
         }
-        return new ObjectMapper().writeValueAsString(jsonList);
+        String json=new ObjectMapper().writeValueAsString(jsonList);
+        return ResultUtils.success(json);
     }
 
     @Override
-    public String csvToXml(String csvString) throws IOException, CsvValidationException{
+    public BaseResponse<String> csvToXml(String csvString) throws IOException, CsvValidationException{
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -57,11 +60,12 @@ public class CsvServiceImpl implements CsvService {
         }
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-        return xmlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataList);
+        String xml=xmlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataList);
+        return ResultUtils.success(xml);
     }
 
     @Override
-    public String csvToYaml(String csvString)throws IOException, CsvValidationException {
+    public BaseResponse<String> csvToYaml(String csvString)throws IOException, CsvValidationException {
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -79,7 +83,7 @@ public class CsvServiceImpl implements CsvService {
         Yaml yaml = new Yaml(options);
         StringWriter writer = new StringWriter();
         yaml.dump(personList, writer);
-        return writer.toString();
+        return ResultUtils.success(writer.toString());
     }
 
     @Override
