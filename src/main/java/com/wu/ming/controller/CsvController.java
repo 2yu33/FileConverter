@@ -38,15 +38,15 @@ public class CsvController {
         return csvService.csvToYaml(csvString);
     }
     @PostMapping(value = "/file/csv2json")
-    public ResponseEntity<byte[]> fileCsvToJson(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToJson(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
         return csvService.fileCsvToJson(file);
     }
     @PostMapping(value = "/file/csv2xml")
-    public ResponseEntity<byte[]> fileCsvToXml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToXml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
         return csvService.fileCsvToXml(file);
     }
     @PostMapping(value = "/file/csv2yaml")
-    public ResponseEntity<byte[]> fileCsvToYaml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToYaml(@RequestPart("file") MultipartFile file) throws IOException, CsvValidationException {
         return csvService.fileCsvToYaml(file);
     }
     @PostMapping("/validate/csv")

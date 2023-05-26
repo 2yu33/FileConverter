@@ -46,7 +46,7 @@ public interface CsvService {
      * @throws IOException
      * @throws CsvValidationException
      */
-    ResponseEntity<byte[]> fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException;
+    ResponseEntity fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException;
 
     /**
      * 把传入的csv文件转换为xml格式并以文件方式下载
@@ -55,7 +55,7 @@ public interface CsvService {
      * @throws IOException
      * @throws CsvValidationException
      */
-    ResponseEntity<byte[]> fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException;
+    ResponseEntity fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException;
 
     /**
      * 把传入的csv文件转换为yaml格式并以文件方式下载
@@ -64,5 +64,5 @@ public interface CsvService {
      * @throws IOException
      * @throws CsvValidationException
      */
-    ResponseEntity<byte[]> fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException;
+    ResponseEntity fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException;
 }

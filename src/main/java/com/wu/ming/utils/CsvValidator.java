@@ -19,7 +19,6 @@ public class CsvValidator {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
 
             int size = csvParser.getHeaderNames().size();
-            System.out.println(size);
 
             for (CSVRecord csvRecord : csvParser) {
 

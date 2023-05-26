@@ -11,6 +11,8 @@ import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.common.BaseResponse;
 import com.wu.ming.common.ResultUtils;
 import com.wu.ming.service.CsvService;
+import com.wu.ming.utils.CsvValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,9 +29,13 @@ import java.util.Map;
 @Service
 public class CsvServiceImpl implements CsvService {
 
-
+    @Autowired
+    private CsvValidator csvValidator;
     @Override
     public BaseResponse<String> csvToJson(String csvString) throws IOException, CsvValidationException {
+        if (!csvValidator.validateCsv(csvString)){
+            return ResultUtils.error(201,"格式错误","csv格式错误！");
+        }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -47,6 +53,9 @@ public class CsvServiceImpl implements CsvService {
 
     @Override
     public BaseResponse<String> csvToXml(String csvString) throws IOException, CsvValidationException{
+        if (!csvValidator.validateCsv(csvString)){
+            return ResultUtils.error(201,"格式错误","csv格式错误！");
+        }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -66,6 +75,9 @@ public class CsvServiceImpl implements CsvService {
 
     @Override
     public BaseResponse<String> csvToYaml(String csvString)throws IOException, CsvValidationException {
+        if (!csvValidator.validateCsv(csvString)){
+            return ResultUtils.error(201,"格式错误","csv格式错误！");
+        }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -87,7 +99,10 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public ResponseEntity<byte[]> fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
+        if (!csvValidator.fileValidateCsv(file)){
+            return ResponseEntity.badRequest().body("CSV格式不正确！");
+        }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -122,7 +137,10 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public ResponseEntity<byte[]> fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
+        if (!csvValidator.fileValidateCsv(file)){
+            return ResponseEntity.badRequest().body("CSV格式不正确！");
+        }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
@@ -156,7 +174,10 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public ResponseEntity<byte[]> fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
+    public ResponseEntity fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
+        if (!csvValidator.fileValidateCsv(file)){
+            return ResponseEntity.badRequest().body("CSV格式不正确！");
+        }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
         String[] nextLine;
