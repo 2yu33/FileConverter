@@ -1,23 +1,14 @@
 package com.wu.ming;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.wu.ming.service.XmlService;
-import com.wu.ming.service.YAMLService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.wu.ming.service.JsonService;
-import org.json.JSONArray;
+import com.wu.ming.service.XmlService;
 import org.json.JSONException;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 class MingApplicationTests {
@@ -25,8 +16,6 @@ class MingApplicationTests {
     @Autowired
     private XmlService xmlService;
 
-    @Autowired
-    private YAMLService yamlService;
 
     @Resource
     private JsonService jsonService;
@@ -114,7 +103,6 @@ class MingApplicationTests {
                 "  state: AnyState\n" +
                 "  country: AnyCountry";
 
-        System.out.println(yamlService.yamlValidate(yamlStr));
     }
 
     @Test

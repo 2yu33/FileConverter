@@ -5,20 +5,15 @@ import com.wu.ming.service.XmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import javax.annotation.Resource;
 
 @RestController
 public class XmlController {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private XmlService xmlService;
@@ -30,17 +25,17 @@ public class XmlController {
      * @return 转换后的结果
      */
     @PostMapping("/xml2yaml")
-    public String xml2yaml(String xmlStr) {
+    public String xml2yaml(@RequestBody String xmlStr) {
         return xmlService.xml2yaml(xmlStr);
     }
 
-    @PostMapping("/xml2csv")
-    public String xml2csv(String xmlStr) throws Exception {
+    @PostMapping(value="/xml2csv", produces = "text/csv")
+    public String xml2csv(@RequestBody String xmlStr) throws Exception {
         return xmlService.xml2csv(xmlStr);
     }
 
     @PostMapping("/xml2json")
-    public String xml2json(String xmlStr){
+    public String xml2json(@RequestBody String xmlStr){
         return xmlService.xml2json(xmlStr);
     }
 

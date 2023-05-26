@@ -15,7 +15,6 @@ import com.wu.ming.service.XmlService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -39,6 +39,7 @@ import java.util.*;
 public class XmlServiceImpl implements XmlService {
 
 
+    // xml转yaml
     @Override
     public String xml2yaml(String xmlStr) {
         String reYaml = "";
@@ -56,62 +57,38 @@ public class XmlServiceImpl implements XmlService {
         return reYaml;
     }
 
+    // xml转csv
     @Override
     public String xml2csv(String xmlStr) throws Exception {
-        // Parse the XML string
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(new StringReader(xmlStr));
+        try {
+            // 解析XML字符串为JsonNode对象
+            XmlMapper xmlMapper = new XmlMapper();
+            JsonNode rootNode = xmlMapper.readTree(xmlStr);
 
-        // Get the root element
-        Element root = document.getRootElement();
+            // 创建CSVWriter对象
+            StringWriter stringWriter = new StringWriter();
+            CSVWriter csvWriter = new CSVWriter(stringWriter);
 
-        // Create a StringWriter to hold the CSV content
-        StringWriter writer = new StringWriter();
-        CSVWriter csvWriter = new CSVWriter(writer);
+            // 动态生成CSV标题行
+            List<String> headers = new ArrayList<>();
+            extractFieldNames(rootNode, headers, "");
+            csvWriter.writeNext(headers.toArray(new String[0]));
 
-        // Convert XML elements to CSV rows
-        convertElementToCSV(root, csvWriter);
+            // 递归处理XML节点，写入CSV数据行
+            processXmlNode(rootNode, csvWriter);
 
-        // Flush and close the CSV writer
-        csvWriter.flush();
-        csvWriter.close();
+            // 关闭CSVWriter
+            csvWriter.close();
 
-        // Return the CSV string
-        return writer.toString();
-    }
-
-
-    private static void convertElementToCSV(Element element, CSVWriter csvWriter) {
-        // Get the element's name
-        String[] row = new String[]{element.getName(), ""};
-        csvWriter.writeNext(row);
-
-        // Get the element's attributes
-        List attributes = element.attributes();
-        for (Object attribute : attributes) {
-            if (attribute instanceof org.dom4j.Attribute) {
-                org.dom4j.Attribute attr = (org.dom4j.Attribute) attribute;
-                String[] attrRow = new String[]{attr.getName(), attr.getValue()};
-                csvWriter.writeNext(attrRow);
-            }
-        }
-
-        // Get the element's text value
-        String text = element.getText().trim();
-        if (!text.isEmpty()) {
-            String[] textRow = new String[]{"", text};
-            csvWriter.writeNext(textRow);
-        }
-
-        // Process the element's child elements recursively
-        List elements = element.elements();
-        for (Object obj : elements) {
-            if (obj instanceof Element) {
-                Element childElement = (Element) obj;
-                convertElementToCSV(childElement, csvWriter);
-            }
+            // 返回CSV字符串
+            return stringWriter.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 处理异常情况，返回错误信息
+            return "XML 到 CSV 转换期间出错。";
         }
     }
+
 
     // xml转JSON
     @Override
@@ -235,79 +212,6 @@ public class XmlServiceImpl implements XmlService {
     }
 
 
-    public static void main(String[] args) throws IOException {
-        // Read XML input from user
-        String xmlInput = "<root><person><name>John</name><age>30</age><email>john@example.com</email></person><person><name>Jane</name><age>25</age><email>jane@example.com</email></person></root>";
-
-        // Parse XML input into JsonNode
-        XmlMapper xmlMapper = new XmlMapper();
-        JsonNode rootNode = xmlMapper.readTree(xmlInput);
-
-        // Convert JsonNode to CSV string
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
-
-        if (rootNode.isArray()) {
-            // If the root node is an array, use the first element as the schema
-            ArrayNode arrayNode = (ArrayNode) rootNode;
-            ObjectNode firstObjectNode = (ObjectNode) arrayNode.get(0);
-
-            // Add the field names to the CSV schema
-            Iterator<String> fieldNames = firstObjectNode.fieldNames();
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                csvSchemaBuilder.addColumn(fieldName);
-            }
-
-            // Write each object in the array to a row in the CSV string
-            StringBuilder csvStringBuilder = new StringBuilder();
-            for (JsonNode node : arrayNode) {
-                ObjectNode objectNode = (ObjectNode) node;
-                Iterator<JsonNode> fields = objectNode.elements();
-                while (fields.hasNext()) {
-                    JsonNode field = fields.next();
-                    if (field.isObject()) {
-                        csvStringBuilder.append(field.toString());
-                    } else {
-                        csvStringBuilder.append(field.asText());
-                    }
-                    csvStringBuilder.append(",");
-                }
-                csvStringBuilder.deleteCharAt(csvStringBuilder.length() - 1);
-                csvStringBuilder.append("\n");
-            }
-            System.out.println(csvStringBuilder.toString());
-        } else if (rootNode.isObject()) {
-            // If the root node is an object, use its fields as the schema
-            ObjectNode objectNode = (ObjectNode) rootNode;
-
-            // Add the field names to the CSV schema
-            Iterator<String> fieldNames = objectNode.fieldNames();
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                csvSchemaBuilder.addColumn(fieldName);
-            }
-
-            // Write the object to a row in the CSV string
-            StringBuilder csvStringBuilder = new StringBuilder();
-            Iterator<JsonNode> fields = objectNode.elements();
-            while (fields.hasNext()) {
-                JsonNode field = fields.next();
-                if (field.isObject()) {
-                    csvStringBuilder.append(field.toString());
-                } else {
-                    csvStringBuilder.append(field.asText());
-                }
-                csvStringBuilder.append(",");
-            }
-            csvStringBuilder.deleteCharAt(csvStringBuilder.length() - 1);
-            csvStringBuilder.append("\n");
-            System.out.println(csvStringBuilder.toString());
-        }
-    }
-
-
-
     private org.w3c.dom.Document parseXmlDocument(InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringElementContentWhitespace(true); // 忽略元素内容中的空格
@@ -358,39 +262,28 @@ public class XmlServiceImpl implements XmlService {
     }
 
 
-    private void traverseXmlElement(org.w3c.dom.Element element, Set<String> elementNames) {
-        // 获取当前元素的名称
-        String elementName = element.getTagName();
-        elementNames.add(elementName);
+    private void processXmlNode(org.w3c.dom.Element element, List<String[]> csvData, String[] csvHeader) {
+        if (element.getNodeName().equals("item")) { // 只处理直接子元素为"item"的情况
+            // 填充CSV行数据
+            String[] csvRow = new String[csvHeader.length];
+            for (int i = 0; i < csvHeader.length; i++) {
+                Node node = element.getElementsByTagName(csvHeader[i]).item(0);
+                String value = (node != null) ? node.getTextContent() : "";
+                csvRow[i] = value;
+            }
+            if (!Arrays.equals(csvRow, csvHeader)) { // 不添加与标题行相同的行
+                csvData.add(csvRow);
+            }
+        }
 
-        // 遍历子元素
+        // 递归处理直接子元素
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
             if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                traverseXmlElement((org.w3c.dom.Element) childNode, elementNames);
-            }
-        }
-    }
-
-    private void processXmlNode(org.w3c.dom.Element element, List<String[]> csvData, String[] csvHeader) {
-        // 填充CSV行数据
-        String[] csvRow = new String[csvHeader.length];
-        for (int i = 0; i < csvHeader.length; i++) {
-            Node node = element.getElementsByTagName(csvHeader[i]).item(0);
-            String value = (node != null) ? node.getTextContent() : "";
-            csvRow[i] = value;
-        }
-        if (!Arrays.equals(csvRow, csvHeader)) { // 不添加与标题行相同的行
-            csvData.add(csvRow);
-        }
-
-        // 递归处理子元素
-        NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("item")) {
-                processXmlNode((org.w3c.dom.Element) childNode, csvData, csvHeader);
+                if (childNode.getNodeName().equals("item")) {
+                    processXmlNode((Element) childNode, csvData, csvHeader);
+                }
             }
         }
     }
@@ -406,6 +299,59 @@ public class XmlServiceImpl implements XmlService {
         fis.close();
         bos.close();
         return bos.toByteArray();
+    }
+
+
+    private void extractFieldNames(JsonNode node, List<String> headers, String parentPath) {
+        if (node.isObject()) {
+            // 如果节点是对象，则处理其子节点
+            Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                String fieldName = field.getKey();
+                extractFieldNames(field.getValue(), headers, parentPath + fieldName + ".");
+            }
+        } else if (node.isArray()) {
+            // 如果节点是数组，则递归处理数组元素
+            for (JsonNode arrayNode : node) {
+                extractFieldNames(arrayNode, headers, parentPath);
+            }
+        } else {
+            // 提取节点名称作为标题，仅添加不存在的字段名称
+            String[] pathParts = parentPath.split("\\.");
+            String fieldName = pathParts[pathParts.length - 1];
+            if (!headers.contains(fieldName)) {
+                headers.add(fieldName);
+            }
+        }
+    }
+
+    private void processXmlNode(JsonNode node, CSVWriter csvWriter) {
+        if (node.isObject()) {
+            // 如果节点是对象，则处理其子节点
+            List<String> rowData = new ArrayList<>();
+            Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                String fieldName = field.getKey();
+                JsonNode valueNode = field.getValue();
+                if (valueNode.isTextual()) {
+                    rowData.add(valueNode.asText());
+                } else if (valueNode.isObject() || valueNode.isArray()) {
+                    int initialSize = rowData.size(); // 记录初始大小
+                    processXmlNode(valueNode, csvWriter);
+                    if (rowData.size() == initialSize) {
+                        rowData.add(""); // 只在没有添加新数据时添加占位符
+                    }
+                }
+            }
+            csvWriter.writeNext(rowData.toArray(new String[0]));
+        } else if (node.isArray()) {
+            // 如果节点是数组，则递归处理数组元素
+            for (JsonNode arrayNode : node) {
+                processXmlNode(arrayNode, csvWriter);
+            }
+        }
     }
 
 }
