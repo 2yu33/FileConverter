@@ -200,7 +200,7 @@ public class XmlServiceImpl implements XmlService {
         }
     }
 
-    // xml验证
+    // xml格式校验
     @Override
     public boolean xmlValidate(String xmlStr) {
         try {
@@ -211,6 +211,18 @@ public class XmlServiceImpl implements XmlService {
         }
     }
 
+    // xml文件格式校验
+    @Override
+    public boolean xmlFileValidate(MultipartFile file) {
+        try {
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(file.getInputStream());
+            return true; // XML 格式正确
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+            return false; // XML 格式错误
+        }
+    }
 
     private org.w3c.dom.Document parseXmlDocument(InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

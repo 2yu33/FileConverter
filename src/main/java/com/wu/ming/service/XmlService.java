@@ -58,4 +58,10 @@ public interface XmlService {
      */
     boolean xmlValidate(String xmlStr);
 
+    /**
+     * 判断xml文件是否规范
+     * @param file xml文件
+     * @return              是否规范
+     */
+    boolean xmlFileValidate(MultipartFile file);
 }
