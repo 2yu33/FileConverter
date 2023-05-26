@@ -1,7 +1,6 @@
 package com.wu.ming.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +29,7 @@ public interface YAMLService {
      * @return 转换后的字符串
      * yaml转换csv
      */
-    String toCSV(String yamlString) throws JsonProcessingException;
+    String toCSV(String yamlString) throws IOException;
 
     /**
      * @author: 小C
