@@ -6,13 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.wu.ming.service.YAMLService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.*;;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +24,12 @@ import java.util.Map;
  */
 @Service
 public class YAMLServiceImpl implements YAMLService {
+    /**
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换json
+     * @author: 小C
+     */
     @Override
     public String toJSON(String yamlString) throws JsonProcessingException {
         try {
@@ -36,6 +44,12 @@ public class YAMLServiceImpl implements YAMLService {
         return JSON.toJSONString(yamlObject);
     }
 
+    /**
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换xml
+     * @author: 小C
+     */
     @Override
     public String toXML(String yamlString) throws JsonProcessingException {
         try {
@@ -52,57 +66,186 @@ public class YAMLServiceImpl implements YAMLService {
         return xml;
     }
 
+    /**
+     * @param yamlString
+     * @return 转换后的字符串
+     * yaml转换csv
+     * @author: 小C
+     */
     @Override
-    public ResponseEntity<String> toCSV(String yamlString){
-        try {
-            Yaml yaml = new Yaml();
-            yaml.load(yamlString);
-        } catch (Exception e) {
-            return  new ResponseEntity<>("输入yaml格式错误", HttpStatus.EXPECTATION_FAILED);
-        }
-        // 创建YAMLMapper和ObjectMapper实例
-        YAMLMapper yamlMapper = new YAMLMapper();
-        Object yamlObject = null;
-        try {
-            yamlObject = yamlMapper.readValue(yamlString, Object.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        Map<String, Object> yamlMap = (Map<String, Object>) yamlObject;
+    public String toCSV(String yamlString){
+        Yaml yaml = new Yaml();
+
+        // 解析 YAML 字符串
+        List<Map<String, Object>> data = yaml.load(yamlString);
+
+        // 创建 StringBuilder 以构建 CSV 字符串
         StringBuilder csvBuilder = new StringBuilder();
-        for (Map.Entry<String, Object> entry : yamlMap.entrySet()) {
-            csvBuilder.append(entry.getKey()).append(",");
-            if (entry.getValue() instanceof Map) {
-                Map<String, String> mapValue = (Map<String, String>) entry.getValue();
-                for (Map.Entry<String, String> mapEntry : mapValue.entrySet()) {
-                    csvBuilder.append(mapEntry.getValue()).append(",");
-                }
-            } else {
-                csvBuilder.append(entry.getValue().toString()).append(",");
+
+        // 写入 CSV 标题行
+        Map<String, Object> firstItem = data.get(0);
+        for (String key : firstItem.keySet()) {
+            csvBuilder.append(key).append(",");
+        }
+        csvBuilder.deleteCharAt(csvBuilder.length() - 1);
+        csvBuilder.append("\n");
+
+        // 写入 CSV 数据行
+        for (Map<String, Object> item : data) {
+            for (Object value : item.values()) {
+                csvBuilder.append(value).append(",");
             }
-            csvBuilder.setLength(csvBuilder.length() - 1);
+            csvBuilder.deleteCharAt(csvBuilder.length() - 1);
             csvBuilder.append("\n");
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
-        return new ResponseEntity<>(csvBuilder.toString(), HttpStatus.OK);
+        return csvBuilder.toString();
     }
 
+    /**
+     * @param file
+     * @return 转换后的文件
+     * yaml转换json
+     * @author: 小C
+     */
     @Override
-    public ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) {
-        return null;
+    public ResponseEntity<byte[]> fileYamlToJson(MultipartFile file) throws IOException {
+        //读取文件
+        BufferedReader reader = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            String line = reader.readLine();
+            while (StringUtils.hasLength(line)) {
+                buffer.append(line);
+                buffer.append("\n");
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = this.toJSON(buffer.toString()).getBytes();
+        // 指定下载文件的名称和类型
+        String fileName = "file.json";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
 
+    /**
+     * @param file
+     * @return 转换后的文件
+     * yaml转换xml
+     * @author: 小C
+     */
     @Override
-    public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) {
-        return null;
+    public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException {
+        //读取文件
+        BufferedReader reader = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            String line = reader.readLine();
+            while (StringUtils.hasLength(line)) {
+                buffer.append(line);
+                buffer.append("\n");
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = this.toXML(buffer.toString()).getBytes();
+        // 指定下载文件的名称和类型
+        String fileName = "file.xml";
+        String contentType = MediaType.APPLICATION_XML_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
     }
 
+    /**
+     * @param file
+     * @return 转换后的文件
+     * yaml转换csv
+     * @author: 小C
+     */
     @Override
-    public ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) {
-        return null;
-    }
+    public ResponseEntity<byte[]> fileYamlToCsv(MultipartFile file) throws IOException {
+        //读取文件
+        BufferedReader reader = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            String line = reader.readLine();
+            while (StringUtils.hasLength(line)) {
+                buffer.append(line);
+                buffer.append("\n");
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
+        }
+        // 将请求中的数据转换为字节数组
+        byte[] fileData = this.toCSV(buffer.toString()).getBytes();
+        // 指定下载文件的名称和类型
+        String fileName = "file.csv";
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileData);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+    }
 
 }
