@@ -23,8 +23,6 @@ public class CsvController {
 
     @Autowired
     private CsvService csvService;
-    @Autowired
-    private CsvValidator csvValidator;
     @PostMapping("/csv2json")
     public BaseResponse<String> csvToJson(@RequestBody String csvString) throws IOException, CsvValidationException {
         return csvService.csvToJson(csvString);
