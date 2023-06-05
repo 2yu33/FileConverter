@@ -74,11 +74,14 @@ public class YAMLServiceImpl implements YAMLService {
      */
     @Override
     public String toCSV(String yamlString){
-        Yaml yaml = new Yaml();
-
-        // 解析 YAML 字符串
-        List<Map<String, Object>> data = yaml.load(yamlString);
-
+        List<Map<String, Object>> data;
+        try {
+            Yaml yaml = new Yaml();
+            // 解析 YAML 字符串
+             data = yaml.load(yamlString);
+        }catch (Exception e) {
+            return JSON.toJSONString("输入yaml格式错误");
+        }
         // 创建 StringBuilder 以构建 CSV 字符串
         StringBuilder csvBuilder = new StringBuilder();
 
