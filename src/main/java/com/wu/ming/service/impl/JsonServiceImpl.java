@@ -2,20 +2,19 @@ package com.wu.ming.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.wu.ming.common.ErrorCode;
+import com.wu.ming.exception.BusinessException;
 import com.wu.ming.service.JsonService;
-import net.sf.json.JSON;
-import net.sf.json.JSONSerializer;
-import net.sf.json.xml.XMLSerializer;
+import com.wu.ming.utils.jsonCompression;
+import com.wu.ming.utils.jsonValidation;
 import org.json.CDL;
 import org.json.JSONArray;
-import org.json.XML;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,22 +24,56 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
 @Service
 
 public class JsonServiceImpl implements JsonService {
+    @Override
+    public String json2XmlCompress(String jsonString) throws JsonProcessingException {
+        ObjectMapper jsonMapper = new ObjectMapper();
+        JsonNode rootNode = jsonMapper.readTree(jsonString);
+        if (rootNode.isArray()) {
+            // 如果JSON是一个数组，则将其包装在一个对象中
+            ObjectNode wrapperNode = jsonMapper.createObjectNode();
+            wrapperNode.set("items", rootNode);
+            rootNode = wrapperNode;}
+            XmlMapper xmlMapper = new XmlMapper();
+            String xmlString ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+xmlMapper.writeValueAsString(rootNode);
+            return xmlString;
+    }
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Override
-    public String json2Xml(String jsonString) {
-//        将json字符串通过库解析称为json
-        JSON json = JSONSerializer.toJSON(jsonString);
-        XMLSerializer xmlSerializer = new XMLSerializer();
-        xmlSerializer.setTypeHintsEnabled(false);
-//        通过库将json转为xml字符串
-        String xmlString = xmlSerializer.write(json);
+    public String json2Xml(String jsonString) throws JsonProcessingException {
+//                //        将json字符串通过库解析称为json
+//        JSON json = JSONSerializer.toJSON(jsonString);
+//        XMLSerializer xmlSerializer = new XMLSerializer();
+//        xmlSerializer.setTypeHintsEnabled(false);
+////        通过库将json转为xml字符串
+//        String xmlString = xmlSerializer.write(json);
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        JsonNode rootNode = jsonMapper.readTree(jsonString);
+        if (rootNode.isArray()) {
+            // 如果JSON是一个数组，则将其包装在一个对象中
+            ObjectNode wrapperNode = jsonMapper.createObjectNode();
+            wrapperNode.set("items", rootNode);
+            rootNode = wrapperNode;
+        }
+        XmlMapper xmlMapper = new XmlMapper();
+        String xmlString ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+xmlMapper.writeValueAsString(rootNode);
+        StringBuilder stringBuilder = new StringBuilder(xmlString);
+        for (int i=0;i<stringBuilder.length();i++){
+            if(stringBuilder.charAt(i)=='>'){
+              stringBuilder.insert(i+1,'\n');
+              stringBuilder.insert(i+2,' ');
+              stringBuilder.insert(i+3,' ');
+              i = i+3;
+            }
+        }
+        xmlString = stringBuilder.toString();
         return xmlString;
     }
 
@@ -66,6 +99,7 @@ public class JsonServiceImpl implements JsonService {
             Map<String, Object> map = (Map<String, Object>) jsonObject;
             yamlString = yaml.dump(map);
         }
+
         return yamlString;
     }
 
@@ -99,8 +133,10 @@ public class JsonServiceImpl implements JsonService {
     public ResponseEntity<byte[]> fileJson2Xml(MultipartFile file) throws IOException {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
-
-
+//        json格式校验，不符合则抛出异常
+        if (jsonContent ==null)
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        jsonValidation.isJson(jsonContent);
         String xmlContent = json2Xml(jsonContent);
 
         // 将XML字符串转换为字节数组
@@ -132,10 +168,12 @@ public class JsonServiceImpl implements JsonService {
     public ResponseEntity<byte[]> fileJson2Yaml(MultipartFile file) throws IOException {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
-
+        //        json格式校验，不符合则抛出异常
+        jsonValidation.isJson(jsonContent);
         //        将读取的json字符串转为yaml
         String yamlContent = json2Yaml(jsonContent);
-
+        // 将yaml字符串压缩，去除掉没有意义的空格和换行符
+//        yamlContent= jsonCompression.compress(yamlContent);
         // 将yaml字符串转换为字节数组
         byte[] yamlBytes = yamlContent.getBytes();
 
@@ -163,7 +201,8 @@ public class JsonServiceImpl implements JsonService {
     public ResponseEntity<byte[]> fileJson2Csv(MultipartFile file) throws IOException {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
-
+        //        json格式校验，不符合则抛出异常
+        jsonValidation.isJson(jsonContent);
         //        将读取的json字符串转为yaml
         String csvContent = json2Csv(jsonContent);
 
@@ -188,5 +227,35 @@ public class JsonServiceImpl implements JsonService {
                 .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
 
     }
+    @Override
+   public ResponseEntity<byte[]> fileJson2XmlCompress(MultipartFile file) throws IOException{
+        // 读取上传的JSON文件
+        String jsonContent = new String(file.getBytes());
+//        json格式校验，不符合则抛出异常
+        jsonValidation.isJson(jsonContent);
+        String xmlContent = json2XmlCompress(jsonContent);
 
+        // 将XML字符串转换为字节数组
+        byte[] xmlBytes = xmlContent.getBytes();
+
+
+
+        // 设置响应头信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.xml");
+        // 指定下载文件的名称和类型
+        String fileName = "file.xml";
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(xmlBytes);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+    }
 }
