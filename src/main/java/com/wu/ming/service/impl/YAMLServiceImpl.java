@@ -25,7 +25,7 @@ import java.util.Map;
 @Service
 public class YAMLServiceImpl implements YAMLService {
     /**
-     * @param yamlString
+     * @param yamlString yaml字符串
      * @return 转换后的字符串
      * yaml转换json
      * @author: 小C
@@ -45,7 +45,7 @@ public class YAMLServiceImpl implements YAMLService {
     }
 
     /**
-     * @param yamlString
+     * @param yamlString yaml字符串
      * @return 转换后的字符串
      * yaml转换xml
      * @author: 小C
@@ -67,7 +67,7 @@ public class YAMLServiceImpl implements YAMLService {
     }
 
     /**
-     * @param yamlString
+     * @param yamlString yaml字符串
      * @return 转换后的字符串
      * yaml转换csv
      * @author: 小C
@@ -106,7 +106,7 @@ public class YAMLServiceImpl implements YAMLService {
     }
 
     /**
-     * @param file
+     * @param file yaml文件
      * @return 转换后的文件
      * yaml转换json
      * @author: 小C
@@ -155,7 +155,7 @@ public class YAMLServiceImpl implements YAMLService {
     }
 
     /**
-     * @param file
+     * @param file yaml文件
      * @return 转换后的文件
      * yaml转换xml
      * @author: 小C
@@ -204,7 +204,7 @@ public class YAMLServiceImpl implements YAMLService {
     }
 
     /**
-     * @param file
+     * @param file yaml文件
      * @return 转换后的文件
      * yaml转换csv
      * @author: 小C
