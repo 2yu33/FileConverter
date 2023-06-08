@@ -2,8 +2,8 @@ package com.wu.ming.common;
 
 /**
  * 返回工具类
- *
- * @author yupi
+ * 将结果集封装成统一的格式
+ * @author yu
  */
 public class ResultUtils {
 

@@ -1,12 +1,16 @@
 package com.wu.ming;
-
+import com.wu.ming.service.JsonService;
 import org.springframework.boot.test.context.SpringBootTest;
 
+
+import javax.annotation.Resource;
 
 
 @SpringBootTest
 public class MingTest {
-    public static void main(String[] args) {
+    @Resource
+    JsonService jsonService;
 
-    }
+
+
 }
