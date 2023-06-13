@@ -5,7 +5,6 @@ import com.wu.ming.service.EsService;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -15,16 +14,19 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
+@Service
 public class EsServiceImpl implements EsService {
 
-    @Autowired
+    @Resource
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     // 分页查询数据
@@ -51,7 +53,6 @@ public class EsServiceImpl implements EsService {
                             .should(QueryBuilders.matchQuery("content", keyword))
                     );
         }
-
         // 分页条件构造
         PageRequest pageRequest = PageRequest.of(current, pageSize);
         // 排序
@@ -76,6 +77,8 @@ public class EsServiceImpl implements EsService {
         // 进行搜索
         try {
             SearchHits<FileSearchDTO> searchHit = elasticsearchRestTemplate.search(nativeSearchQueryBuilder.build(), FileSearchDTO.class);
+            List<SearchHit<FileSearchDTO>> searchHits = searchHit.getSearchHits();
+            searchHits.forEach(System.out::println);
             return searchHit.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
         } catch (Exception e) {
             log.error(e.getMessage());

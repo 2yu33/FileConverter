@@ -27,7 +27,7 @@ public class FileSearchDTO {
      * 文章id
      */
     @Id
-    private Integer id;
+    private String id;
 
     /**
      * 文件名称
