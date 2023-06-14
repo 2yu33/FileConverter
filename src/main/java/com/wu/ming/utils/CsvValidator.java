@@ -34,17 +34,10 @@ public class CsvValidator {
                 if (csvRecord.size() != size) {
                     return false;
                 }
-                //检查记录是否为空行
-//                boolean isEmptyRow = true;
-//                for (String field : csvRecord) {
-//                    if (field.trim().isEmpty()) {
-//                        isEmptyRow = false;
-//                        break;
-//                    }
-//                }
-//                if (!isEmptyRow){
-//                    return false;
-//                }
+                //检查每行是否包含“,”
+                if (!csvRecord.toString().contains(",")){
+                    return false;
+                }
             }
 
             return true;
@@ -70,17 +63,10 @@ public class CsvValidator {
                 if (csvRecord.size() != size) {
                     return false;
                 }
-                //检查记录是否为空行
-//                boolean isEmptyRow = true;
-//                for (String field : csvRecord) {
-//                    if (field.trim().isEmpty()) {
-//                        isEmptyRow = false;
-//                        break;
-//                    }
-//                }
-//                if (!isEmptyRow){
-//                    return false;
-//                }
+                //检查每行是否包含“,”
+                if(!csvRecord.toString().contains(",")){
+                    return false;
+                }
             }
             return true;
         } catch (IOException e) {
