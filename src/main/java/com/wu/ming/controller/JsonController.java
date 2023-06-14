@@ -54,6 +54,8 @@ public class JsonController {
     public BaseResponse<String>json2Csv(@RequestBody String jsonStr) throws JsonProcessingException {
         if (jsonStr == null)
             throw new BusinessException(ErrorCode.NULL_ERROR);
+//        json格式校验，不符合则抛出异常
+//        jsonValidation.isJson(jsonStr);
         return ResultUtils.success(jsonService.json2Csv(jsonStr));
     }
     @PostMapping("/file/json2xml")
