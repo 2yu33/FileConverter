@@ -13,6 +13,7 @@ import com.wu.ming.common.ResultUtils;
 import com.wu.ming.service.CsvService;
 import com.wu.ming.utils.CsvValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -101,7 +102,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            return ResponseEntity.badRequest().body("CSV格式不正确！");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultUtils.error(201,"格式错误！","CSV格式不正确！"));
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
@@ -139,7 +140,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            return ResponseEntity.badRequest().body("CSV格式不正确！");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultUtils.error(201,"格式错误！","CSV格式不正确！"));
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
@@ -176,7 +177,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            return ResponseEntity.badRequest().body("CSV格式不正确！");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultUtils.error(201,"格式错误！","CSV格式不正确！"));
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
