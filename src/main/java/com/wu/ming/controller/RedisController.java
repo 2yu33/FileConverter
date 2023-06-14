@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static com.wu.ming.common.ErrorCode.SYSTEM_ERROR;
+
 /**
  * @author CH
  * redis服务
@@ -28,8 +30,14 @@ public class RedisController {
 @PostMapping("/{id}")
     public BaseResponse updateRedisFile(@PathVariable String id,@RequestPart("file") MultipartFile file) throws IOException {
         String base64File = Base64.encode(file.getBytes());
-        if(StringUtils.isNotBlank(base64File)) redisService.set(id, base64File);
-        return new BaseResponse(200,null,"存储成功");
+        if(StringUtils.isNotBlank(base64File))
+        {
+            redisService.set(id, base64File);
+            return new BaseResponse(200,null,"存储成功");
+        }
+       else{
+           return new BaseResponse(SYSTEM_ERROR.getCode(),null,"文件为空");
+        }
     }
 @GetMapping("/{id}")
     public ResponseEntity<byte[]> getRedisFile(@PathVariable String id) throws IOException {
