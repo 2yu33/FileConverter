@@ -8,9 +8,12 @@ import javax.annotation.Resource;
 
 @SpringBootTest
 public class MingTest {
-    @Resource
-    JsonService jsonService;
-
-
+    public static void main(String[] args) {
+        MingTest mingTest = new MingTest();
+        String s = new String();
+        System.out.println(mingTest.getClass().getClassLoader().getParent().getParent());
+        System.out.println(s.getClass().getClassLoader());
+        new Thread().start();
+    }
 
 }
