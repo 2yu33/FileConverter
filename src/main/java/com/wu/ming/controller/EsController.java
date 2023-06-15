@@ -87,7 +87,7 @@ public class EsController {
         String content = fileSearchDTO.getContent();
         // 设置响应头
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("text/yaml"));
+        headers.setContentType(MediaType.parseMediaType("text/"+fileSearchDTO.getFileSuffix()));
         headers.setContentDispositionFormData("attachment", fileSearchDTO.getFileName()+"."+fileSearchDTO.getFileSuffix());
 
         // Convert YAML content to byte array

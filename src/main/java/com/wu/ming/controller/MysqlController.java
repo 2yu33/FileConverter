@@ -21,8 +21,11 @@ public class MysqlController {
      public BaseResponse<Long> mysqlAdd(@RequestPart("file") MultipartFile file){
         return  ResultUtils.success(converterService.addConverter(file));
     }
-    @PostMapping("/list/page")
-    public BaseResponse<Page<Converter>> listPage(@RequestBody PageUtils pageUtils){
+    @GetMapping("/list/page")
+    public BaseResponse<Page<Converter>> listPage(int current, int pageSize){
+        PageUtils pageUtils = new PageUtils();
+        pageUtils.setPageNum(current);
+        pageUtils.setPageSize(pageSize);
         return ResultUtils.success(converterService.selectConverters(pageUtils));
     }
     @GetMapping("/get/one")
