@@ -7,7 +7,7 @@ import com.wu.ming.common.ErrorCode;
 import com.wu.ming.common.ResultUtils;
 import com.wu.ming.exception.BusinessException;
 import com.wu.ming.service.JsonService;
-import com.wu.ming.utils.jsonValidation;
+import com.wu.ming.utils.JSONTools;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +31,7 @@ public class JsonController {
         if (jsonStr == null)
             throw new BusinessException(ErrorCode.NULL_ERROR);
 //        json格式校验，不符合则抛出异常
-        jsonValidation.isJson(jsonStr);
+          JSONTools.isJson(jsonStr);
         return ResultUtils.success(jsonService.json2Xml(jsonStr));
     }
     /**
@@ -43,7 +43,7 @@ public class JsonController {
         if (jsonStr == null)
             throw new BusinessException(ErrorCode.NULL_ERROR);
 //        json格式校验，不符合则抛出异常
-        jsonValidation.isJson(jsonStr);
+        JSONTools.isJson(jsonStr);
         return ResultUtils.success(jsonService.json2Yaml(jsonStr));
     }
     /**
