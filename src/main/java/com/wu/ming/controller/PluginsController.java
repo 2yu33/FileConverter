@@ -7,8 +7,12 @@ import com.wu.ming.plugins.PluginsHandler;
 import com.wu.ming.vo.OpenPluginVO;
 import com.wu.ming.vo.PluginInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +59,7 @@ public class PluginsController {
 
 
     /**
-     * 插件实现数据转换
+     * 插件实现数据字符串转换
      * @param input   传入数据类型
      * @param output  传出数据类型
      * @param dataStr 要转换的数据
@@ -65,6 +69,14 @@ public class PluginsController {
     public BaseResponse<String> pluginsConvert(@PathVariable("input")String input, @PathVariable("output") String output,@RequestBody String dataStr){
         // 通过输入和输出对获取数据
         return ResultUtils.success(pluginsHandler.convert(input, output, dataStr));
+    }
+
+    /**
+     * 插件实现文件转换
+     */
+    @PostMapping(value = "/plugins/file/{input}2{output}")
+    public ResponseEntity<byte[]> convertXmlToCsv(@PathVariable("input")String input, @PathVariable("output") String output,@RequestPart("file") MultipartFile file) throws IOException {
+        return pluginsHandler.fileConvert(input, output, file);
     }
 
     /**
