@@ -36,7 +36,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public BaseResponse<String> csvToJson(String csvString) throws IOException, CsvValidationException {
         if (!csvValidator.validateCsv(csvString)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
@@ -56,7 +56,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public BaseResponse<String> csvToXml(String csvString) throws IOException, CsvValidationException{
         if (!csvValidator.validateCsv(csvString)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
@@ -78,7 +78,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public BaseResponse<String> csvToYaml(String csvString)throws IOException, CsvValidationException {
         if (!csvValidator.validateCsv(csvString)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new StringReader(csvString));
         String[] headers = reader.readNext();
@@ -103,7 +103,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToJson(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
@@ -141,7 +141,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToXml(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();
@@ -178,7 +178,7 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public ResponseEntity fileCsvToYaml(MultipartFile file) throws IOException, CsvValidationException {
         if (!csvValidator.fileValidateCsv(file)){
-            throw new BusinessException(ErrorCode.TYPE_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
         String[] headers = reader.readNext();

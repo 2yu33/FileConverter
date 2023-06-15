@@ -1,14 +1,23 @@
 package com.wu.ming.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.wu.ming.service.XmlService;
+import com.wu.ming.utils.XMLFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -51,7 +60,7 @@ public class XmlController {
     }
 
     @PostMapping(value = "/file/xml2csv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> convertXmlToCsv(@RequestPart("file") MultipartFile file) {
+    public ResponseEntity<byte[]> convertXmlToCsv(@RequestPart("file") MultipartFile file) throws IOException {
         return xmlService.fileXml2Csv(file);
     }
 
@@ -62,34 +71,19 @@ public class XmlController {
     }
 
     // xml文件排版
-    // @PostMapping("/xmlComposing")
-    // public ResponseEntity<byte[]> uploadXMLFile(@RequestParam("file") MultipartFile file) {
-    //     if (!file.isEmpty()) {
-    //         try {
-    //             // 解析上传的 XML 文件
-    //             Document document = Dom4jUtils.parseXML(file.getInputStream());
-    //
-    //             // 规范化 XML 文件
-    //             Document formattedDocument = Dom4jUtils.formatXML(document);
-    //
-    //             // 将规范化后的 XML 文件转换为字节数组
-    //             byte[] fileBytes = Dom4jUtils.getDocumentBytes(formattedDocument);
-    //
-    //             // 设置响应头，指定下载的文件名
-    //             HttpHeaders headers = new HttpHeaders();
-    //             headers.setContentDispositionFormData("attachment", "formatted_file.xml");
-    //             headers.setContentType(MediaType.APPLICATION_XML);
-    //
-    //             // 返回响应实体，包含字节数组和响应头
-    //             return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
-    //         } catch (IOException | DocumentException e) {
-    //             e.printStackTrace();
-    //             // 处理文件上传失败的情况
-    //         }
-    //     }
-    //
-    //     // 处理文件为空的情况
-    //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-    // }
+    @PostMapping("/xmlComposing")
+    public ResponseEntity<byte[]> uploadXMLFile(@RequestParam("file") MultipartFile file) throws IOException {
+        String xmlStr = new String(file.getBytes());
+        String format = XMLFormatUtils.format(xmlStr);
+        // 设置下载文件的响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", "converted.csv");
+
+        // 返回包含CSV文件内容的响应实体
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(format.getBytes(StandardCharsets.UTF_8));
+    }
 
 }
