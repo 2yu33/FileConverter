@@ -3,7 +3,7 @@ package com.wu.ming;
 /**
  * 数据转换规范
  */
-public class Yaml2PropertiesService implements DataConvertService{
+public class DataConvertServiceImpl implements DataConvertService{
 
 
     @Override
