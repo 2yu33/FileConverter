@@ -2,7 +2,6 @@ package com.wu.ming.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,8 +10,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.wu.ming.common.ErrorCode;
 import com.wu.ming.exception.BusinessException;
 import com.wu.ming.service.JsonService;
-import com.wu.ming.utils.jsonCompression;
-import com.wu.ming.utils.jsonValidation;
+import com.wu.ming.utils.JSONTools;
 import org.json.CDL;
 import org.json.JSONArray;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +23,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Service
 
@@ -47,33 +46,16 @@ public class JsonServiceImpl implements JsonService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public String json2Xml(String jsonString) throws JsonProcessingException {
-//                //        将json字符串通过库解析称为json
-//        JSON json = JSONSerializer.toJSON(jsonString);
-//        XMLSerializer xmlSerializer = new XMLSerializer();
-//        xmlSerializer.setTypeHintsEnabled(false);
-////        通过库将json转为xml字符串
-//        String xmlString = xmlSerializer.write(json);
-
-        ObjectMapper jsonMapper = new ObjectMapper();
-        JsonNode rootNode = jsonMapper.readTree(jsonString);
-        if (rootNode.isArray()) {
-            // 如果JSON是一个数组，则将其包装在一个对象中
-            ObjectNode wrapperNode = jsonMapper.createObjectNode();
-            wrapperNode.set("items", rootNode);
-            rootNode = wrapperNode;
-        }
+        // 创建ObjectMapper和XmlMapper对象
+        ObjectMapper objectMapper = new ObjectMapper();
         XmlMapper xmlMapper = new XmlMapper();
-        String xmlString ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+xmlMapper.writeValueAsString(rootNode);
-        StringBuilder stringBuilder = new StringBuilder(xmlString);
-        for (int i=0;i<stringBuilder.length();i++){
-            if(stringBuilder.charAt(i)=='>'){
-              stringBuilder.insert(i+1,'\n');
-              stringBuilder.insert(i+2,' ');
-              stringBuilder.insert(i+3,' ');
-              i = i+3;
-            }
-        }
-        xmlString = stringBuilder.toString();
+
+        // 将JSON字符串解析为Java对象
+        Object json = objectMapper.readValue(jsonString, Object.class);
+
+        // 将Java对象转换为XML字符串
+        String xmlString = JSONTools.replaceSpaceWithUnderscoreInXml(xmlMapper.writeValueAsString(json));
+
         return xmlString;
     }
 
@@ -136,7 +118,7 @@ public class JsonServiceImpl implements JsonService {
 //        json格式校验，不符合则抛出异常
         if (jsonContent ==null)
             throw new BusinessException(ErrorCode.NULL_ERROR);
-        jsonValidation.isJson(jsonContent);
+        JSONTools.isJson(jsonContent);
         String xmlContent = json2Xml(jsonContent);
 
         // 将XML字符串转换为字节数组
@@ -169,7 +151,7 @@ public class JsonServiceImpl implements JsonService {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
         //        json格式校验，不符合则抛出异常
-        jsonValidation.isJson(jsonContent);
+        JSONTools.isJson(jsonContent);
         //        将读取的json字符串转为yaml
         String yamlContent = json2Yaml(jsonContent);
         // 将yaml字符串压缩，去除掉没有意义的空格和换行符
@@ -202,7 +184,7 @@ public class JsonServiceImpl implements JsonService {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
         //        json格式校验，不符合则抛出异常
-        jsonValidation.isJson(jsonContent);
+        JSONTools.isJson(jsonContent);
         //        将读取的json字符串转为yaml
         String csvContent = json2Csv(jsonContent);
 
@@ -232,7 +214,7 @@ public class JsonServiceImpl implements JsonService {
         // 读取上传的JSON文件
         String jsonContent = new String(file.getBytes());
 //        json格式校验，不符合则抛出异常
-        jsonValidation.isJson(jsonContent);
+        JSONTools.isJson(jsonContent);
         String xmlContent = json2XmlCompress(jsonContent);
 
         // 将XML字符串转换为字节数组
