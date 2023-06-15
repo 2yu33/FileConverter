@@ -3,6 +3,7 @@ import com.wu.ming.dao.FileEsDao;
 import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.service.EsService;
 import com.wu.ming.service.JsonService;
+import com.wu.ming.utils.UUIDUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @SpringBootTest
@@ -29,8 +31,9 @@ public class MingTest {
     public void testEs(){
         FileSearchDTO fileSearchDTO = FileSearchDTO
                 .builder()
-                .fileName("测试文件名称3")
-                .content("测试文件数据的内容3")
+                .id(Integer.parseInt(UUIDUtils.getUuidNum()))
+                .fileName("测试文件名称1")
+                .content("测试文件数据的内容1")
                 .fileSuffix(".xml")
                 .create_time(new Date())
                 .build();
@@ -51,6 +54,7 @@ public class MingTest {
 
     @Test
     public void testDelete(){
+        // fileEsDao.deleteById(2116938679);
         fileEsDao.deleteAll();
     }
 

@@ -102,7 +102,7 @@ public class PluginsHandler {
      */
     public void changePluginType(PluginInfoVO pluginInfoVO){
         // 判断是否已经开启了相同的插件
-        if (openPluginsMap.containsKey(pluginInfoVO.getPluginType().toLowerCase())){
+        if (pluginInfoVO.getIsOpen() && openPluginsMap.containsKey(pluginInfoVO.getPluginType().toLowerCase())){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "插件启动重复");
         }
         // 对插件状态进行修改
