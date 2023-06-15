@@ -1,6 +1,7 @@
 package com.wu.ming.plugins;
 
 import com.wu.ming.DataConvertService;
+import com.wu.ming.dto.PluginInfoDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ public class PluginsHandler {
      * 服务转换所有插件
      * a2b:对应的接口
      */
-    public static HashMap<String, DataConvertService> allPluginMap = new HashMap<>();
+    public static HashMap<String, PluginInfoDTO> allPluginMap = new HashMap<>();
 
     /**
      * 已经开启的插件
@@ -68,13 +69,30 @@ public class PluginsHandler {
                 DataConvertService dataConvertService = (DataConvertService) clazz.newInstance();
 
                 // 将读取到的插件添加到allPluginMap中
-                allPluginMap.put(dataConvertService.getConvertType(), dataConvertService);
+                allPluginMap.put(dataConvertService.getConvertType(),
+                        PluginInfoDTO.builder()
+                                .dataConvertService(dataConvertService)
+                                .isOpen(Boolean.FALSE)
+                                .build());
             }
         }
         for (String key : allPluginMap.keySet()) {
             System.out.println(key + "--->" + allPluginMap.get(key));
         }
     }
+
+    /**
+     * 通过对应的转换类型进行获取
+     */
+    public String convert(String input, String output, String dataStr){
+        String key = getKey(input,output);
+        if (openPluginsMap.containsKey(key)){
+            return openPluginsMap.get(key).dataConvert(dataStr);
+        }else {
+            return "没有开启此插件";
+        }
+    }
+
 
     // TODO 修改成扫描jar包中所有实现了DataConvertService接口的类
     public void loadPlugins2() throws Exception {
@@ -120,6 +138,9 @@ public class PluginsHandler {
 
     }
 
+    private String getKey(String input, String output){
+        return input + "2" + output;
+    }
 
 
     private String getClassName() {
