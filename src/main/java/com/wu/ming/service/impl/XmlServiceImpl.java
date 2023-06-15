@@ -44,6 +44,9 @@ public class XmlServiceImpl implements XmlService {
 
     @Override
     public String xml2yaml(String xmlStr) {
+        if (!xmlValidate(xmlStr)){
+            return "转换失败,格式错误";
+        }
         String reYaml = "";
         ObjectMapper xmlMapper = new XmlMapper();
         Object xmlObject = null;
@@ -61,6 +64,9 @@ public class XmlServiceImpl implements XmlService {
 
     @Override
     public String xml2csv(String xmlStr) throws Exception {
+        if (!xmlValidate(xmlStr)){
+            return "转换失败,格式错误";
+        }
         // Parse the XML string
         SAXReader reader = new SAXReader();
         Document document = reader.read(new StringReader(xmlStr));
@@ -119,6 +125,9 @@ public class XmlServiceImpl implements XmlService {
     // xml转JSON
     @Override
     public String xml2json(String xmlStr) {
+        if (!xmlValidate(xmlStr)){
+            return "转换失败,格式错误";
+        }
         String jsonStr = null;
         try {
             XmlMapper xmlMapper = new XmlMapper();
@@ -140,6 +149,15 @@ public class XmlServiceImpl implements XmlService {
     // xml文件转json文件
     @Override
     public ResponseEntity<byte[]> fileXml2json(MultipartFile xmlFile) throws IOException {
+        if (!xmlValidate(new String(xmlFile.getBytes()))){
+            // 构建响应
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.json");
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("转换失败,格式错误".getBytes(StandardCharsets.UTF_8));
+        }
         // 使用 XmlMapper 将 XML 转换为 JSON
         XmlMapper xmlMapper = new XmlMapper();
         Object json = xmlMapper.readValue(xmlFile.getBytes(), Object.class);
@@ -166,6 +184,15 @@ public class XmlServiceImpl implements XmlService {
     // xml文件转yaml文件
     @Override
     public ResponseEntity<byte[]> fileXml2Yaml(MultipartFile xmlFile) throws IOException {
+        if (!xmlValidate(new String(xmlFile.getBytes()))){
+            // 构建响应
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.json");
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("转换失败,格式错误".getBytes(StandardCharsets.UTF_8));
+        }
         // Read XML file content
         InputStream inputStream = xmlFile.getInputStream();
         String xmlContent = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
@@ -187,9 +214,44 @@ public class XmlServiceImpl implements XmlService {
         return new ResponseEntity<>(yamlBytes, headers, HttpStatus.OK);
     }
 
+    // xml验证
+    @Override
+    public boolean xmlValidate(String xmlStr) {
+        try {
+            Document document = DocumentHelper.parseText(xmlStr);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    public static String fileXml2Json(File xmlFile) throws DocumentException, IOException {
+        // 使用dom4j库解析XML文件
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(xmlFile);
+
+        // 使用Jackson库将XML转换为JSON字符串
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(document);
+
+        return json;
+    }
+
+
+
     // xml文件转csv文件
     @Override
-    public ResponseEntity<byte[]> fileXml2Csv(MultipartFile xmlFile) {
+    public ResponseEntity<byte[]> fileXml2Csv(MultipartFile xmlFile) throws IOException {
+        if (!xmlValidate(new String(xmlFile.getBytes()))){
+            // 构建响应
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.json");
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("转换失败,格式错误".getBytes(StandardCharsets.UTF_8));
+        }
         try {
             // 解析XML文件为Document对象
             org.w3c.dom.Document xmlDocument = parseXmlDocument(xmlFile.getInputStream());
@@ -226,102 +288,6 @@ public class XmlServiceImpl implements XmlService {
         }
     }
 
-    // xml验证
-    @Override
-    public boolean xmlValidate(String xmlStr) {
-        try {
-            Document document = DocumentHelper.parseText(xmlStr);
-            return true;
-        } catch (DocumentException e) {
-            return false;
-        }
-    }
-
-
-    public static String fileXml2Json(File xmlFile) throws DocumentException, IOException {
-        // 使用dom4j库解析XML文件
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(xmlFile);
-
-        // 使用Jackson库将XML转换为JSON字符串
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(document);
-
-        return json;
-    }
-
-    public static void main(String[] args) throws IOException {
-        // Read XML input from user
-        String xmlInput = "<root><person><name>John</name><age>30</age><email>john@example.com</email></person><person><name>Jane</name><age>25</age><email>jane@example.com</email></person></root>";
-
-        // Parse XML input into JsonNode
-        XmlMapper xmlMapper = new XmlMapper();
-        JsonNode rootNode = xmlMapper.readTree(xmlInput);
-
-        // Convert JsonNode to CSV string
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
-
-        if (rootNode.isArray()) {
-            // If the root node is an array, use the first element as the schema
-            ArrayNode arrayNode = (ArrayNode) rootNode;
-            ObjectNode firstObjectNode = (ObjectNode) arrayNode.get(0);
-
-            // Add the field names to the CSV schema
-            Iterator<String> fieldNames = firstObjectNode.fieldNames();
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                csvSchemaBuilder.addColumn(fieldName);
-            }
-
-            // Write each object in the array to a row in the CSV string
-            StringBuilder csvStringBuilder = new StringBuilder();
-            for (JsonNode node : arrayNode) {
-                ObjectNode objectNode = (ObjectNode) node;
-                Iterator<JsonNode> fields = objectNode.elements();
-                while (fields.hasNext()) {
-                    JsonNode field = fields.next();
-                    if (field.isObject()) {
-                        csvStringBuilder.append(field.toString());
-                    } else {
-                        csvStringBuilder.append(field.asText());
-                    }
-                    csvStringBuilder.append(",");
-                }
-                csvStringBuilder.deleteCharAt(csvStringBuilder.length() - 1);
-                csvStringBuilder.append("\n");
-            }
-            System.out.println(csvStringBuilder.toString());
-        } else if (rootNode.isObject()) {
-            // If the root node is an object, use its fields as the schema
-            ObjectNode objectNode = (ObjectNode) rootNode;
-
-            // Add the field names to the CSV schema
-            Iterator<String> fieldNames = objectNode.fieldNames();
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                csvSchemaBuilder.addColumn(fieldName);
-            }
-
-            // Write the object to a row in the CSV string
-            StringBuilder csvStringBuilder = new StringBuilder();
-            Iterator<JsonNode> fields = objectNode.elements();
-            while (fields.hasNext()) {
-                JsonNode field = fields.next();
-                if (field.isObject()) {
-                    csvStringBuilder.append(field.toString());
-                } else {
-                    csvStringBuilder.append(field.asText());
-                }
-                csvStringBuilder.append(",");
-            }
-            csvStringBuilder.deleteCharAt(csvStringBuilder.length() - 1);
-            csvStringBuilder.append("\n");
-            System.out.println(csvStringBuilder.toString());
-        }
-    }
-
-
 
     private org.w3c.dom.Document parseXmlDocument(InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -349,8 +315,6 @@ public class XmlServiceImpl implements XmlService {
         return csvData;
     }
 
-
-
     private String[] getXmlElementNames(org.w3c.dom.Element element) {
         NodeList itemList = element.getElementsByTagName("item");
         org.w3c.dom.Element firstItem = (org.w3c.dom.Element) itemList.item(0);
@@ -373,21 +337,6 @@ public class XmlServiceImpl implements XmlService {
         return childElementNames.toArray(new String[0]);
     }
 
-
-    private void traverseXmlElement(org.w3c.dom.Element element, Set<String> elementNames) {
-        // 获取当前元素的名称
-        String elementName = element.getTagName();
-        elementNames.add(elementName);
-
-        // 遍历子元素
-        NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                traverseXmlElement((org.w3c.dom.Element) childNode, elementNames);
-            }
-        }
-    }
 
     private void processXmlNode(org.w3c.dom.Element element, List<String[]> csvData, String[] csvHeader) {
         // 填充CSV行数据
