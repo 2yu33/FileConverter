@@ -32,8 +32,8 @@ public class MingTest {
         FileSearchDTO fileSearchDTO = FileSearchDTO
                 .builder()
                 .id(Integer.parseInt(UUIDUtils.getUuidNum()))
-                .fileName("测试文件名称2")
-                .content("测试文件数据的内容2")
+                .fileName("测试文件名称1")
+                .content("测试文件数据的内容1")
                 .fileSuffix(".xml")
                 .create_time(new Date())
                 .build();
@@ -54,8 +54,8 @@ public class MingTest {
 
     @Test
     public void testDelete(){
-        fileEsDao.deleteById(381486048);
-        // fileEsDao.deleteAll();
+        // fileEsDao.deleteById(2116938679);
+        fileEsDao.deleteAll();
     }
 
 }

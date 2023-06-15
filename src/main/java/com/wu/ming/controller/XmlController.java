@@ -77,12 +77,12 @@ public class XmlController {
         String format = XMLFormatUtils.format(xmlStr);
         // 设置下载文件的响应头
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentDispositionFormData("attachment", "converted.csv");
+        headers.setContentDispositionFormData("attachment", "converted.xml");
 
         // 返回包含CSV文件内容的响应实体
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType("text/csv"))
+                .contentType(MediaType.parseMediaType("text/xml"))
                 .body(format.getBytes(StandardCharsets.UTF_8));
     }
 

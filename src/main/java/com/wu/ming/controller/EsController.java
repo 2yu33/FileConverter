@@ -5,11 +5,16 @@ import com.wu.ming.common.ResultUtils;
 import com.wu.ming.dao.FileEsDao;
 import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.service.impl.EsServiceImpl;
+import com.wu.ming.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +48,7 @@ public class EsController {
             // 文件大小
             long fileSize = file.getSize();
             FileSearchDTO fileSearchDTO = FileSearchDTO.builder()
+                    .id(Integer.parseInt(UUIDUtils.getUuidNum()))
                     .fileName(fileName)
                     .fileSuffix(fileSuffix)
                     .content(content)
@@ -52,7 +58,7 @@ public class EsController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ResultUtils.success(null);
+        return ResultUtils.success("上传文件成功");
     }
 
     /**
@@ -70,5 +76,25 @@ public class EsController {
     public BaseResponse<?> delEsFile(Integer esId){
         fileEsDao.deleteById(esId);
         return ResultUtils.success("删除成功");
+    }
+
+    /**
+     * 通过id下载文件
+     */
+    @PostMapping("/es/download/{id}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") Integer id){
+        FileSearchDTO fileSearchDTO = fileEsDao.findById(id).get();
+        String content = fileSearchDTO.getContent();
+        // 设置响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/yaml"));
+        headers.setContentDispositionFormData("attachment", fileSearchDTO.getFileName()+"."+fileSearchDTO.getFileSuffix());
+
+        // Convert YAML content to byte array
+        byte[] yamlBytes = content.getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/xml"))
+                .body(content.getBytes(StandardCharsets.UTF_8));
     }
 }
