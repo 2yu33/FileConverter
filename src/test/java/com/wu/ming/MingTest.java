@@ -43,7 +43,7 @@ public class MingTest {
     @Test
     public void testFind(){
         // fileEsDao.findAll().forEach(System.out::println);
-        List<FileSearchDTO> fileSearchDTOS = esService.pageFileSearch(0, 5, "");
+        List<FileSearchDTO> fileSearchDTOS = esService.pageFileSearch(0, 5);
         fileSearchDTOS.forEach(System.out::println);
     }
 

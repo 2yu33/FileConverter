@@ -13,6 +13,6 @@ public interface EsService {
      * @param keyword  查询条件
      * @return
      */
-    public List<FileSearchDTO> pageFileSearch(int current, int pageSize, String keyword);
+    public List<FileSearchDTO> pageFileSearch(int current, int pageSize);
 
 }
