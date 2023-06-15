@@ -13,7 +13,7 @@ public interface DataConvertService {
 
     /**
      * 获取当前的转换类型
-     * @return 转换类型
+     * @return 转换类型 input2output
      */
     String getConvertType();
 }
