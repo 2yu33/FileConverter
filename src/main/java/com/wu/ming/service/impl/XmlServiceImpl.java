@@ -1,6 +1,7 @@
 package com.wu.ming.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -125,25 +126,18 @@ public class XmlServiceImpl implements XmlService {
     // xml转JSON
     @Override
     public String xml2json(String xmlStr) {
-        if (!xmlValidate(xmlStr)){
-            return "转换失败,格式错误";
-        }
-        String jsonStr = null;
         try {
             XmlMapper xmlMapper = new XmlMapper();
-            // 将xml转换成JsonNode对象，JsonNode为Jackson中表示JSON的树形结构
-            JsonNode jsonNode = xmlMapper.readTree(xmlStr.getBytes(StandardCharsets.UTF_8));
-            System.out.println(jsonNode.textValue());
-            ObjectMapper jsonMapper = new ObjectMapper();
-            // 设置格式化输出
-            jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            List<Map<String, String>> javaObject = xmlMapper.readValue(xmlStr, new TypeReference<List<Map<String, String>>>() {});
 
-            jsonStr = jsonMapper.writeValueAsString(jsonNode);
-            System.out.println(jsonStr);
-        }catch (Exception e){
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writeValueAsString(javaObject);
+
+            return jsonString;
+        } catch (Exception e) {
             e.printStackTrace();
+            return "转换失败";
         }
-        return jsonStr;
     }
 
     // xml文件转json文件
@@ -158,17 +152,7 @@ public class XmlServiceImpl implements XmlService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("转换失败,格式错误".getBytes(StandardCharsets.UTF_8));
         }
-        // 使用 XmlMapper 将 XML 转换为 JSON
-        XmlMapper xmlMapper = new XmlMapper();
-        Object json = xmlMapper.readValue(xmlFile.getBytes(), Object.class);
-
-        // 创建临时 JSON 文件
-        File tempFile = File.createTempFile("converted", ".json");
-        tempFile.deleteOnExit();
-
-        // 将 JSON 写入临时文件
-        ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.writeValue(tempFile, json);
+        String jsonStr = xml2json(new String(xmlFile.getBytes()));
 
         // 构建响应
         HttpHeaders headers = new HttpHeaders();
@@ -176,9 +160,8 @@ public class XmlServiceImpl implements XmlService {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentLength(tempFile.length())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+                .body(jsonStr.getBytes(StandardCharsets.UTF_8));
     }
 
     // xml文件转yaml文件
