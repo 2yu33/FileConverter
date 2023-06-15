@@ -1,5 +1,6 @@
 package com.wu.ming.controller;
 
+import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.common.BaseResponse;
 import com.wu.ming.common.ErrorCode;
 import com.wu.ming.common.ResultUtils;
@@ -46,6 +47,10 @@ public class MongoDBDataController {
     public BaseResponse<String> deleteFile(@PathVariable String fileName) {
         mongoDBDataService.deleteByFileName(fileName);
         return ResultUtils.success("删除成功！");
+    }
+    @PostMapping("/download/{id}")
+    public ResponseEntity downloadFile(@PathVariable("id") String fileName) throws CsvValidationException, IOException {
+        return mongoDBDataService.downloadFile(fileName);
     }
 
     // ...
