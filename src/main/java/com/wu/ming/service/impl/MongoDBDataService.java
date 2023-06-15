@@ -8,40 +8,53 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class MongoDBDataService {
 
     @Autowired
     private MongoDBDataRepository mongoDBDataRepository;
-    @Autowired SequenceService sequenceService;
     @Autowired(required = false)
     private MongoTemplate mongoTemplate;
 
     /**
      * 存入json字符串
+     * @param fileName
      * @param jsonData
      */
-    public void saveJsonData(String jsonData) {
+    public void saveJsonData(String fileName, String jsonData) {
         MongoDBData data = new MongoDBData();
-        Long nextId = sequenceService.getNextSequence("mongoDB_data");
-        data.setId(nextId.toString());
+        data.setFileName(fileName);
         data.setData(jsonData);
         mongoDBDataRepository.save(data);
     }
 
+
     /**
-     * 根据id去查数据
-     * @param id
+     * 查询所有的数据
      * @return
      */
-    public String getJsonDataById(String id) {
-        Query query = new Query(Criteria.where("_id").is(id));
-        MongoDBData mongoDBData = mongoTemplate.findOne(query, MongoDBData.class);
-        if (mongoDBData != null) {
-            return mongoDBData.getData();
-        } else {
-            return "ID为："+id+" 的数据不存在！";
-        }
+    public List<String> getAllData() {
+//        List<String> list = mongoTemplate.findAll(MongoDBData.class).stream()
+//                .map(mongodb -> mongodb.getFileName())
+//                .collect(Collectors.toList());
+        Query query = new Query();
+        query.fields().include("_id");
+
+        List<String> fileNames = mongoTemplate.findDistinct(query, "_id",MongoDBData.class, String.class);
+        return fileNames;
+    }
+
+    /**
+     * 通过文件名删除文件
+     * @param fileName
+     */
+    public void deleteByFileName(String fileName) {
+        Criteria criteria = Criteria.where("fileName").is(fileName);
+        Query query = Query.query(criteria);
+        mongoTemplate.remove(query, MongoDBData.class);
     }
 
     // ...
