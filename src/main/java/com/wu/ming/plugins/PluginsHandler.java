@@ -1,9 +1,13 @@
 package com.wu.ming.plugins;
 
 import com.wu.ming.DataConvertService;
+import com.wu.ming.common.ErrorCode;
 import com.wu.ming.dto.PluginInfoDTO;
+import com.wu.ming.exception.BusinessException;
+import com.wu.ming.vo.PluginInfoVO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -29,15 +33,16 @@ public class PluginsHandler {
      * 服务转换所有插件
      * a2b:对应的接口
      */
-    public static HashMap<String, PluginInfoDTO> allPluginMap = new HashMap<>();
+    public static List<PluginInfoDTO> allPluginList = new ArrayList<>();
 
     /**
      * 已经开启的插件
      */
-    public static HashMap<String, DataConvertService> openPluginsMap = new HashMap<>();
+    public static HashMap<String, PluginInfoDTO> openPluginsMap = new HashMap<>();
 
-
-
+    /**
+     * 项目启动的时候加载所有插件
+     */
     @PostConstruct
     public void loadPlugins() throws Exception {
         // String pluginsDirectoryPath = "F:\\Java_IDEA练习\\FileConverter\\lib";
@@ -60,25 +65,24 @@ public class PluginsHandler {
                 String className = null;
                 try {
                     className = getClassName();
+
+                    Class<?> clazz = classLoader.loadClass(className);
+                    DataConvertService dataConvertService = (DataConvertService) clazz.newInstance();
+
+                    // 将读取到的插件添加到allPluginList中
+                    allPluginList.add(PluginInfoDTO.builder()
+                            .pluginName(jarName)
+                            .dataConvertService(dataConvertService)
+                            .isOpen(Boolean.FALSE)
+                            .build());
                 } catch (Exception e) {
-                    System.out.println(jarName + "读取类名失败,可能是类不符合规范");
+                    System.out.println("获取插件"+jarName+"失败,可能是插件不符合规范");
                     e.printStackTrace();
                 }
-
-                Class<?> clazz = classLoader.loadClass(className);
-                DataConvertService dataConvertService = (DataConvertService) clazz.newInstance();
-
-                // 将读取到的插件添加到allPluginMap中
-                allPluginMap.put(dataConvertService.getConvertType(),
-                        PluginInfoDTO.builder()
-                                .dataConvertService(dataConvertService)
-                                .isOpen(Boolean.FALSE)
-                                .build());
             }
         }
-        for (String key : allPluginMap.keySet()) {
-            System.out.println(key + "--->" + allPluginMap.get(key));
-        }
+        System.out.println("----------加载插件完成-----------");
+        allPluginList.forEach(System.out::println);
     }
 
     /**
@@ -87,12 +91,37 @@ public class PluginsHandler {
     public String convert(String input, String output, String dataStr){
         String key = getKey(input,output);
         if (openPluginsMap.containsKey(key)){
-            return openPluginsMap.get(key).dataConvert(dataStr);
+            return openPluginsMap.get(key).getDataConvertService().dataConvert(dataStr);
         }else {
             return "没有开启此插件";
         }
     }
 
+    /**
+     * 对插件装填进行修改
+     */
+    public void changePluginType(PluginInfoVO pluginInfoVO){
+        // 判断是否已经开启了相同的插件
+        if (openPluginsMap.containsKey(pluginInfoVO.getPluginType().toLowerCase())){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "插件启动重复");
+        }
+        // 对插件状态进行修改
+        for (PluginInfoDTO pluginInfoDTO : allPluginList) {
+            if (pluginInfoVO.getPluginType().equals(pluginInfoDTO.getDataConvertService().getConvertType())){
+                Boolean isOpen = pluginInfoVO.getIsOpen();
+                // 修改当前插件的状态
+                pluginInfoDTO.setIsOpen(isOpen);
+                if (isOpen){
+                    // 将插件信息存储到全局map中
+                    openPluginsMap.put(pluginInfoDTO.getDataConvertService().getConvertType().toLowerCase(), pluginInfoDTO);
+                }else {
+                    openPluginsMap.remove(pluginInfoDTO.getDataConvertService().getConvertType().toLowerCase());
+                }
+                return;
+            }
+        }
+        throw new BusinessException(ErrorCode.SYSTEM_ERROR, "插件不存在");
+    }
 
     // TODO 修改成扫描jar包中所有实现了DataConvertService接口的类
     public void loadPlugins2() throws Exception {
@@ -139,7 +168,8 @@ public class PluginsHandler {
     }
 
     private String getKey(String input, String output){
-        return input + "2" + output;
+        String reS = input + "2" + output;
+        return reS.toLowerCase();
     }
 
 

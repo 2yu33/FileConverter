@@ -1,23 +1,15 @@
 package com.wu.ming.vo;
 
-import com.wu.ming.DataConvertService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PluginInfoVO {
-
-    /**
-     * 插件状态
-     */
-    private Boolean isOpen;
+public class OpenPluginVO {
 
     /**
      * 插件名称
