@@ -6,14 +6,12 @@ import com.wu.ming.dao.FileEsDao;
 import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.service.impl.EsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 public class EsController {
@@ -24,6 +22,11 @@ public class EsController {
     @Autowired
     private EsServiceImpl esService;
 
+    /**
+     * es文件保存
+     * @param file
+     * @return
+     */
     @PostMapping("/es")
     public BaseResponse<String> upload(@RequestPart("file") MultipartFile file){
         try {
@@ -52,9 +55,20 @@ public class EsController {
         return ResultUtils.success(null);
     }
 
+    /**
+     * es分页查询
+     */
     @GetMapping("/es")
-    public BaseResponse<?> pageFileEs(int current, int pageSize, String keyword){
+    public BaseResponse<List<FileSearchDTO>> pageFileEs(int current, int pageSize, String keyword){
         return ResultUtils.success(esService.pageFileSearch(current, pageSize, keyword));
     }
 
+    /**
+     * es删除数据
+     */
+    @DeleteMapping("/es")
+    public BaseResponse<?> delEsFile(Integer esId){
+        fileEsDao.deleteById(esId);
+        return ResultUtils.success("删除成功");
+    }
 }
