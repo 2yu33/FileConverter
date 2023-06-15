@@ -1,10 +1,16 @@
 package com.wu.ming.vo;
 
 import com.wu.ming.DataConvertService;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PluginInfoVO {
 
@@ -18,5 +24,9 @@ public class PluginInfoVO {
      */
     private String pluginName;
 
+    /**
+     * 插件类型
+     */
+    private String pluginType;
 
 }
