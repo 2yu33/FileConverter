@@ -8,7 +8,8 @@ package com.wu.ming.common;
 public enum ErrorCode {
 
     SUCCESS(200, "ok", ""),
-    PARAMS_ERROR(40000, "请求参数格式错误", ""),
+    PARAMS_ERROR(40000, "请求参数格式错误！请重新上传文件！", ""),
+    TYPE_ERROR(201,"格式错误","数据的格式不正确!"),
     NULL_ERROR(40001, "请求数据为空", ""),
     SYSTEM_ERROR(50000, "系统内部异常", "");
 

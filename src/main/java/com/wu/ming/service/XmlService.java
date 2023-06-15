@@ -49,7 +49,7 @@ public interface XmlService {
      * @param xmlFile xml文件
      * @return        转换结果
      */
-    ResponseEntity<byte[]> fileXml2Csv(MultipartFile xmlFile);
+    ResponseEntity<byte[]> fileXml2Csv(MultipartFile xmlFile) throws IOException;
 
     /**
      * xml验证是否符合规范

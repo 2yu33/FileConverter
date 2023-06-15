@@ -1,0 +1,32 @@
+server:
+  port: 8080
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 500MB
+      max-request-size: 500MB
+  # MongoDB
+  data:
+    mongodb:
+      database: admin
+      host: 43.143.149.109
+      port: 27017
+  # MySQL
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    password: 123456
+    url: jdbc:mysql://localhost:3306/yvchangfa
+    username: root
+  # ES
+  elasticsearch:
+    rest:
+      uris: http://www.mingzib.xyz:9200
+  # redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+# 插件jar包配置路径
+plugins:
+  path: F:\Java_IDEA练习\FileConverter\lib
