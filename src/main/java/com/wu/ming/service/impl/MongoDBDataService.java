@@ -13,34 +13,33 @@ public class MongoDBDataService {
 
     @Autowired
     private MongoDBDataRepository mongoDBDataRepository;
-    @Autowired SequenceService sequenceService;
     @Autowired(required = false)
     private MongoTemplate mongoTemplate;
 
     /**
      * 存入json字符串
+     * @param fileName
      * @param jsonData
      */
-    public void saveJsonData(String jsonData) {
+    public void saveJsonData(String fileName, String jsonData) {
         MongoDBData data = new MongoDBData();
-        Long nextId = sequenceService.getNextSequence("mongoDB_data");
-        data.setId(nextId.toString());
+        data.setFileName(fileName);
         data.setData(jsonData);
         mongoDBDataRepository.save(data);
     }
 
     /**
      * 根据id去查数据
-     * @param id
+     * @param fileName
      * @return
      */
-    public String getJsonDataById(String id) {
-        Query query = new Query(Criteria.where("_id").is(id));
+    public String getJsonDataByFileName(String fileName) {
+        Query query = new Query(Criteria.where("fileName").is(fileName));
         MongoDBData mongoDBData = mongoTemplate.findOne(query, MongoDBData.class);
         if (mongoDBData != null) {
             return mongoDBData.getData();
         } else {
-            return "ID为："+id+" 的数据不存在！";
+            return "ID为："+fileName+" 的数据不存在！";
         }
     }
 

@@ -1,5 +1,7 @@
 package com.wu.ming;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * 数据转换规范
  */
@@ -8,6 +10,7 @@ public class Yaml2PropertiesService implements DataConvertService{
 
     @Override
     public String dataConvert(String data) {
+
         return "成功调用:"+data;
     }
 
