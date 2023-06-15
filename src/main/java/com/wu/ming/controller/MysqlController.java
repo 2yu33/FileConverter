@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/mysql")
@@ -22,11 +23,11 @@ public class MysqlController {
         return  ResultUtils.success(converterService.addConverter(file));
     }
     @GetMapping("/list/page")
-    public BaseResponse<Page<Converter>> listPage(int current, int pageSize){
+    public BaseResponse<List<Converter>> listPage(int current, int pageSize){
         PageUtils pageUtils = new PageUtils();
         pageUtils.setPageNum(current);
         pageUtils.setPageSize(pageSize);
-        return ResultUtils.success(converterService.selectConverters(pageUtils));
+        return ResultUtils.success(converterService.selectConverters(pageUtils).getRecords());
     }
     @GetMapping("/get/one")
     public BaseResponse<Converter> getOne(@Param("id") Integer id){
