@@ -7,10 +7,12 @@ import com.wu.ming.model.Converter;
 import com.wu.ming.service.ConverterService;
 import com.wu.ming.utils.PageUtils;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/mysql")
@@ -32,5 +34,9 @@ public class MysqlController {
     @PostMapping("/delete/id")
     public BaseResponse<Boolean> deleteOne(Integer id){
         return ResultUtils.success(converterService.removeConverter(id));
+    }
+    @PostMapping("/download")
+    public ResponseEntity<byte[]> mysqlDownload(Integer id) throws IOException {
+        return converterService.downloadFile(id);
     }
 }

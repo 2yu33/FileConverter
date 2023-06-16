@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wu.ming.model.Converter;
 import com.wu.ming.utils.PageUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
 * @author 余某某
@@ -38,4 +41,11 @@ public interface ConverterService extends IService<Converter> {
        * @return
        */
       Page<Converter> selectConverters(PageUtils pageUtils);
+
+      /**
+       * 通过id下载指定的文件
+       * @param id
+       * @return
+       */
+      ResponseEntity<byte[]> downloadFile(Integer id) throws IOException;
 }

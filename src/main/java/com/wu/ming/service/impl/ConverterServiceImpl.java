@@ -9,10 +9,15 @@ import com.wu.ming.mapper.ConverterMapper;
 import com.wu.ming.model.Converter;
 import com.wu.ming.service.ConverterService;
 import com.wu.ming.utils.PageUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -75,6 +80,32 @@ ConverterMapper converterMapper;
     QueryWrapper<Converter> queryWrapper = new QueryWrapper<>();
     Page<Converter> resultPage = this.page(pageList,queryWrapper);
     return resultPage;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadFile(Integer id) throws IOException {
+        Converter converter = selectConverter(id);
+
+        byte[] fileContent = converter.getContent().getBytes();
+
+        // 设置响应头信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=output.xml");
+        // 指定下载文件的名称和类型
+        String fileName = "file."+converter.getType();
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+
+        // 创建临时文件
+        File tempFile = File.createTempFile("temp", null);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            outputStream.write(fileContent);
+        }
+        // 设置下载响应头
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(org.apache.commons.io.FileUtils.readFileToByteArray(tempFile));
+
     }
 }
 
