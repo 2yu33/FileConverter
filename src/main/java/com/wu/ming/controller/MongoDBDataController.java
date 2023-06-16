@@ -44,14 +44,15 @@ public class MongoDBDataController {
         return ResultUtils.success(mongoDBDataService.getAllData());
     }
 
-    @DeleteMapping("/delete/{fileName}")
-    public BaseResponse<String> deleteFile(@PathVariable String fileName) {
-        mongoDBDataService.deleteByFileName(fileName);
+    @PostMapping("/delete")
+    public BaseResponse<String> deleteFile(@RequestBody FileSearchDTO fileSearchDTO) {
+        mongoDBDataService.deleteByFileName(fileSearchDTO.getFileName());
         return ResultUtils.success("删除成功！");
     }
-    @PostMapping("/download/{id}")
-    public ResponseEntity downloadFile(@PathVariable("id") String fileName) throws CsvValidationException, IOException {
-        return mongoDBDataService.downloadFile(fileName);
+    @PostMapping("/download")
+    public ResponseEntity downloadFile(@RequestBody FileSearchDTO fileSearchDTO) throws CsvValidationException, IOException {
+
+        return mongoDBDataService.downloadFile(fileSearchDTO.getFileName());
     }
 
     // ...
