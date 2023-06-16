@@ -72,18 +72,18 @@ public class EsController {
     /**
      * es删除数据
      */
-    @DeleteMapping("/es")
-    public BaseResponse<?> delEsFile(Integer esId){
-        fileEsDao.deleteById(esId);
+    @PostMapping("/es/delete")
+    public BaseResponse<?> delEsFile(FileSearchDTO fileSearchDTO){
+        fileEsDao.deleteById(fileSearchDTO.getId());
         return ResultUtils.success("删除成功");
     }
 
     /**
      * 通过id下载文件
      */
-    @PostMapping("/es/download/{id}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") Integer id){
-        FileSearchDTO fileSearchDTO = fileEsDao.findById(id).get();
+    @PostMapping("/es/download")
+    public ResponseEntity<byte[]> downloadFile(FileSearchDTO fileSearchDTO){
+        FileSearchDTO downFileSearchDTO = fileEsDao.findById(fileSearchDTO.getId()).get();
         String content = fileSearchDTO.getContent();
         // 设置响应头
         HttpHeaders headers = new HttpHeaders();
