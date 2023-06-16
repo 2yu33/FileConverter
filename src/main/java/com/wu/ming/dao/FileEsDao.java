@@ -8,6 +8,10 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  */
 public interface FileEsDao extends ElasticsearchRepository<FileSearchDTO, Integer> {
 
-
+    /**
+     * 通过id删除信息
+     * @param id
+     */
+    void deleteById(String id);
 
 }

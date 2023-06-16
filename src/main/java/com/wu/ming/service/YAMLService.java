@@ -22,7 +22,7 @@ public interface YAMLService {
      * @return 转换后的字符串
      * yaml转换xml
      */
-    String toXML(String yamlString) throws JsonProcessingException;
+    String toXML(String yamlString) throws IOException, CsvValidationException;
 
     /**
      * @author: 小C
@@ -46,7 +46,7 @@ public interface YAMLService {
      * @return 转换后的文件
      * yaml文件转换xml文件
      */
-    ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException;
+    ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException, CsvValidationException;
     /**
      * @author: 小C
      * yaml文件转换csv文件

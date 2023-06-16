@@ -27,7 +27,7 @@ public class YAMLController {
     }
 
     @GetMapping("/yaml2xml")
-    public String ToXml(String yamlString) throws JsonProcessingException {
+    public String ToXml(String yamlString) throws Exception {
         return yamlService.toXML(yamlString);
     }
 
@@ -42,7 +42,7 @@ public class YAMLController {
     }
 
     @PostMapping(value = "/file/yaml2xml")
-    public ResponseEntity<byte[]> yamlToXml(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> yamlToXml(@RequestPart("file") MultipartFile file) throws Exception {
         return yamlService.fileYamlToXml(file);
     }
 

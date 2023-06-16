@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MongoDBData {
 
     @Id
-    private String id;
+    private String fileName;
     private String data;
 
     // Getter and Setter methods
