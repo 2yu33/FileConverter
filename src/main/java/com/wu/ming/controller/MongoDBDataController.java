@@ -5,6 +5,7 @@ import com.wu.ming.common.BaseResponse;
 import com.wu.ming.common.ErrorCode;
 import com.wu.ming.common.ResultUtils;
 import com.wu.ming.exception.BusinessException;
+import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.service.impl.MongoDBDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class MongoDBDataController {
     }
 
     @GetMapping("/all")
-    public BaseResponse getJsonDataAll() {
+    public BaseResponse<List<FileSearchDTO>> getJsonDataAll() {
         return ResultUtils.success(mongoDBDataService.getAllData());
     }
 

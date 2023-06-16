@@ -4,6 +4,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.common.ErrorCode;
 import com.wu.ming.dao.MongoDBDataRepository;
 import com.wu.ming.exception.BusinessException;
+import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.pojo.MongoDBData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -45,15 +46,18 @@ public class MongoDBDataService {
      * 查询所有的数据
      * @return
      */
-    public List<String> getAllData() {
+    public List<FileSearchDTO> getAllData() {
 //        List<String> list = mongoTemplate.findAll(MongoDBData.class).stream()
 //                .map(mongodb -> mongodb.getFileName())
 //                .collect(Collectors.toList());
         Query query = new Query();
         query.fields().include("_id");
 
-        List<String> fileNames = mongoTemplate.findDistinct(query, "_id",MongoDBData.class, String.class);
-        return fileNames;
+        List<FileSearchDTO> fileSearchDTOS = mongoTemplate.findDistinct(query, "_id", MongoDBData.class, String.class).stream()
+                .map(filename -> new FileSearchDTO(null, filename, null, null, null))
+                .collect(Collectors.toList());
+
+        return fileSearchDTOS;
     }
 
     /**
