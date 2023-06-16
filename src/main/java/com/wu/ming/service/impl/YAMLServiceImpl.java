@@ -4,7 +4,10 @@ import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import com.wu.ming.service.YAMLService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +56,7 @@ public class YAMLServiceImpl implements YAMLService {
      * @author: 小C
      */
     @Override
-    public String toXML(String yamlString) throws JsonProcessingException {
+    public String toXML(String yamlString) throws IOException{
         try {
             Yaml yaml = new Yaml();
             yaml.load(yamlString);
@@ -60,8 +65,9 @@ public class YAMLServiceImpl implements YAMLService {
         }
         // 创建YAMLMapper和ObjectMapper实例
         YAMLMapper yamlMapper = new YAMLMapper();
-        ObjectMapper objectMapper = new XmlMapper();
+        XmlMapper objectMapper = new XmlMapper();
         Object yamlObject = yamlMapper.readValue(yamlString, Object.class);
+        objectMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
         String xml = objectMapper.writeValueAsString(yamlObject);
         return xml;
     }
@@ -161,7 +167,7 @@ public class YAMLServiceImpl implements YAMLService {
      * @author: 小C
      */
     @Override
-    public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> fileYamlToXml(MultipartFile file) throws IOException, CsvValidationException {
         //读取文件
         BufferedReader reader = null;
         StringBuffer buffer = new StringBuffer();

@@ -22,7 +22,7 @@ public class MysqlController {
      public BaseResponse<Long> mysqlAdd(@RequestPart("file") MultipartFile file){
         return  ResultUtils.success(converterService.addConverter(file));
     }
-    @GetMapping("/list/page")
+    @GetMapping("/all")
     public BaseResponse<List<Converter>> listPage(int current, int pageSize){
         PageUtils pageUtils = new PageUtils();
         pageUtils.setPageNum(current);
