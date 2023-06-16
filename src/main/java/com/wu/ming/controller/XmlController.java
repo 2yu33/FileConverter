@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.wu.ming.service.XmlService;
 import com.wu.ming.utils.XMLFormatUtils;
+import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -65,8 +66,9 @@ public class XmlController {
     }
 
 
+    // 验证xml格式
     @PostMapping("/xmlValidate")
-    public Boolean xmlValidate(String xmlStr){
+    public Boolean xmlValidate(@RequestBody String xmlStr){
         return xmlService.xmlValidate(xmlStr);
     }
 
@@ -84,6 +86,23 @@ public class XmlController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/xml"))
                 .body(format.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // xml压缩
+    @PostMapping("/xmlCompress")
+    public ResponseEntity<byte[]> xmlCompress(@RequestParam("file") MultipartFile file) throws IOException, DocumentException {
+        String xmlStr = new String(file.getBytes());
+        // 清除换行和回车
+        // xmlStr.replaceAll("\n\r","");
+        String formatXml = XMLFormatUtils.xmlFormat(xmlStr);
+        // 设置下载文件的响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", "converted.xml");
+
+        // 返回包含CSV文件内容的响应实体
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(formatXml.getBytes(StandardCharsets.UTF_8));
     }
 
 }

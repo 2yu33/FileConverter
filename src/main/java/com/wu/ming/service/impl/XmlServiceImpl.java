@@ -126,6 +126,9 @@ public class XmlServiceImpl implements XmlService {
     // xml转JSON
     @Override
     public String xml2json(String xmlStr) {
+        if (!xmlValidate(xmlStr)){
+            return "转换失败,格式错误";
+        }
         try {
             XmlMapper xmlMapper = new XmlMapper();
             List<Map<String, String>> javaObject = xmlMapper.readValue(xmlStr, new TypeReference<List<Map<String, String>>>() {});
@@ -136,7 +139,7 @@ public class XmlServiceImpl implements XmlService {
             return jsonString;
         } catch (Exception e) {
             e.printStackTrace();
-            return "转换失败";
+            return "转换失败,格式错误";
         }
     }
 

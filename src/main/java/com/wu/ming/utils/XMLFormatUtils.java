@@ -3,6 +3,14 @@ package com.wu.ming.utils;
 
 import com.wu.ming.common.ErrorCode;
 import com.wu.ming.exception.BusinessException;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * 格式化xml字符串
@@ -66,6 +74,41 @@ public class XMLFormatUtils {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"xml报文格式不正确");
         }
         return format;
+    }
+
+    /**
+     * xml压缩
+     *
+     * @param xmlString  XML 字符串
+     * @return 返回压缩后的 XML 字符串
+     */
+    public static String xmlFormat(String xmlString)
+            throws IOException, DocumentException {
+
+        // 输入是 XML 字符串
+        if (xmlString == null) {
+            throw new BootstrapMethodError("xml为空");
+        }
+
+        // 解析 XML 字符串，并将其转换为一个 Document 对象
+        Document xmlElement = DocumentHelper.parseText(xmlString);
+
+        OutputFormat format;
+        // 设置 DOM4J 输出格式，并创建字符输出流对象（紧凑格式）
+        format = OutputFormat.createCompactFormat();
+        // 指定 XML 编码为 UTF-8
+        format.setEncoding("utf-8");
+        // 去掉多余的空格
+        format.setTrimText(true);
+
+        // 创建字符输出流对象
+        StringWriter stringWriter = new StringWriter();
+
+        // 使用 DOM4J 的 XMLWriter 将 XML 写入字符输出流中
+        new XMLWriter(stringWriter, format).write(xmlElement);
+
+        // 返回转换后的 XML 字符串，删除第一个换行符
+        return stringWriter.toString().replaceFirst("\n", "");
     }
 
     /**
