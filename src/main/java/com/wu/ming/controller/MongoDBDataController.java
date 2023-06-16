@@ -28,7 +28,7 @@ public class MongoDBDataController {
         this.mongoDBDataService = mongoDBDataService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping()
     public BaseResponse<String> saveJsonData(@RequestPart("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new BusinessException(ErrorCode.NULL_ERROR);
