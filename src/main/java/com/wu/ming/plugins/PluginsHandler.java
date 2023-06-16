@@ -6,13 +6,18 @@ import com.wu.ming.dto.PluginInfoDTO;
 import com.wu.ming.exception.BusinessException;
 import com.wu.ming.vo.PluginInfoVO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -94,6 +99,24 @@ public class PluginsHandler {
             return openPluginsMap.get(key).getDataConvertService().dataConvert(dataStr);
         }else {
             return "没有开启此插件";
+        }
+    }
+
+    /**
+     * 通过对应的转换类型进行文件转换
+     */
+    public ResponseEntity<byte[]> fileConvert(String input, String output, MultipartFile file){
+        String key = getKey(input,output);
+        if (openPluginsMap.containsKey(key)){
+            try {
+                return openPluginsMap.get(key).getDataConvertService().fileDataConvert(file);
+            } catch (IOException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR,"转换异常");
+            }
+        }else {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("转换失败,格式错误".getBytes(StandardCharsets.UTF_8));
         }
     }
 

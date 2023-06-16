@@ -64,9 +64,9 @@ public class EsController {
     /**
      * es分页查询
      */
-    @GetMapping("/es")
-    public BaseResponse<List<FileSearchDTO>> pageFileEs(int current, int pageSize, String keyword){
-        return ResultUtils.success(esService.pageFileSearch(current, pageSize, keyword));
+    @GetMapping("/es/all")
+    public BaseResponse<List<FileSearchDTO>> pageFileEs(int current, int pageSize){
+        return ResultUtils.success(esService.pageFileSearch(current, pageSize));
     }
 
     /**

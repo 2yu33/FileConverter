@@ -31,8 +31,8 @@ public class EsServiceImpl implements EsService {
 
     // 分页查询数据
     @Override
-    public List<FileSearchDTO> pageFileSearch(int current, int pageSize, String keyword) {
-        return doSearch(buildQuery(current, pageSize, keyword));
+    public List<FileSearchDTO> pageFileSearch(int current, int pageSize) {
+        return doSearch(buildQuery(current, pageSize));
     }
 
     /**
@@ -40,19 +40,19 @@ public class EsServiceImpl implements EsService {
      * @param keyword 查询关键词
      * @return        条件构造器
      */
-    private NativeSearchQueryBuilder buildQuery(int current, int pageSize, String keyword){
+    private NativeSearchQueryBuilder buildQuery(int current, int pageSize){
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
 
         // 查询条件构造
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         // 看有没有查询条件
-        if (StringUtils.hasLength(keyword)){
-            boolQueryBuilder
-                    .must(QueryBuilders.boolQuery()
-                            .should(QueryBuilders.matchQuery("fileName", keyword))
-                            .should(QueryBuilders.matchQuery("content", keyword))
-                    );
-        }
+        // if (StringUtils.hasLength(keyword)){
+        //     boolQueryBuilder
+        //             .must(QueryBuilders.boolQuery()
+        //                     .should(QueryBuilders.matchQuery("fileName", keyword))
+        //                     .should(QueryBuilders.matchQuery("content", keyword))
+        //             );
+        // }
         // 分页条件构造
         PageRequest pageRequest = PageRequest.of(current, pageSize);
         // 排序
