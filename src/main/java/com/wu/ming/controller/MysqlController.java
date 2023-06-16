@@ -21,12 +21,12 @@ import java.util.List;
 public class MysqlController {
     @Resource
     ConverterService converterService;
-    @PostMapping("/file/add")
+    @PostMapping()
      public BaseResponse<Long> mysqlAdd(@RequestPart("file") MultipartFile file){
         return  ResultUtils.success(converterService.addConverter(file));
     }
-    @PostMapping("/list/page")
-    public BaseResponse< List<FileSearchDTO>> listPage(int current, int pageSize) {
+    @GetMapping("/all")
+    public BaseResponse<List<FileSearchDTO>> listPage(int current, int pageSize) {
         PageUtils pageUtils = new PageUtils();
         pageUtils.setPageNum(current);
         pageUtils.setPageSize(pageSize);

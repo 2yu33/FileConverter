@@ -73,7 +73,7 @@ public class EsController {
      * es删除数据
      */
     @PostMapping("/es/delete")
-    public BaseResponse<?> delEsFile(FileSearchDTO fileSearchDTO){
+    public BaseResponse<?> delEsFile(@RequestBody FileSearchDTO fileSearchDTO){
         fileEsDao.deleteById(fileSearchDTO.getId());
         return ResultUtils.success("删除成功");
     }
@@ -82,7 +82,7 @@ public class EsController {
      * 通过id下载文件
      */
     @PostMapping("/es/download")
-    public ResponseEntity<byte[]> downloadFile(FileSearchDTO fileSearchDTO){
+    public ResponseEntity<byte[]> downloadFile(@RequestBody FileSearchDTO fileSearchDTO){
         FileSearchDTO downFileSearchDTO = fileEsDao.findById(fileSearchDTO.getId()).get();
         String content = fileSearchDTO.getContent();
         // 设置响应头
