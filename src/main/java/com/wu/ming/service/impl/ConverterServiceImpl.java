@@ -7,6 +7,7 @@ import com.wu.ming.common.ErrorCode;
 import com.wu.ming.exception.BusinessException;
 import com.wu.ming.mapper.ConverterMapper;
 import com.wu.ming.model.Converter;
+import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.service.ConverterService;
 import com.wu.ming.utils.PageUtils;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author 余某某
@@ -75,11 +78,18 @@ ConverterMapper converterMapper;
     }
 
     @Override
-    public Page<Converter> selectConverters(PageUtils pageUtils) {
+    public List<FileSearchDTO> selectConverters(PageUtils pageUtils) {
     Page<Converter> pageList = new Page<>(pageUtils.getPageNum(),pageUtils.getPageSize());
     QueryWrapper<Converter> queryWrapper = new QueryWrapper<>();
     Page<Converter> resultPage = this.page(pageList,queryWrapper);
-    return resultPage;
+        List<Converter> records = resultPage.getRecords();
+        List<FileSearchDTO> fileSearchDTOS = new ArrayList<>();
+        for (Converter record : records) {
+            FileSearchDTO fileSearchDTO = new FileSearchDTO();
+            fileSearchDTO.setId(record.getId());
+            fileSearchDTOS.add(fileSearchDTO);
+        }
+        return fileSearchDTOS;
     }
 
     @Override

@@ -3,11 +3,13 @@ package com.wu.ming.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wu.ming.model.Converter;
+import com.wu.ming.pojo.FileSearchDTO;
 import com.wu.ming.utils.PageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
 * @author 余某某
@@ -40,7 +42,7 @@ public interface ConverterService extends IService<Converter> {
        * 查询所有结果并分页展示
        * @return
        */
-      Page<Converter> selectConverters(PageUtils pageUtils);
+      List<FileSearchDTO> selectConverters(PageUtils pageUtils);
 
       /**
        * 通过id下载指定的文件
